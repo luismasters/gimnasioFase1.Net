@@ -1,0 +1,180 @@
+﻿@model AppGimn.Models.Cliente
+
+@{
+    ViewData["Title"] = $"Detalles de {Model.NombreCompleto}";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user"></i> Detalles del Cliente
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Información Personal -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-id-card"></i> Información Personal
+                            </h5>
+
+                            <dl class="row">
+                                <dt class="col-sm-5">Nombre Completo:</dt>
+                                <dd class="col-sm-7">@Model.NombreCompleto</dd>
+
+                                <dt class="col-sm-5">DNI:</dt>
+                                <dd class="col-sm-7">@Model.DNI</dd>
+
+                                <dt class="col-sm-5">Fecha Nacimiento:</dt>
+                                <dd class="col-sm-7">@Model.FechaNacimiento.ToString("dd/MM/yyyy")</dd>
+
+                                <dt class="col-sm-5">Edad:</dt>
+                                <dd class="col-sm-7">
+                                    @Model.Edad años
+                                    @if (Model.EsMayorDeEdad)
+                                    {
+                                        <span class="badge badge-success">Mayor de edad</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">Menor de edad</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <!-- Contacto -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-phone"></i> Contacto
+                            </h5>
+
+                            <dl class="row">
+                                <dt class="col-sm-5">Teléfono:</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.Telefono))
+                                    {
+                                        <a href="tel:@Model.Telefono" class="text-decoration-none">
+                                            <i class="fas fa-phone text-success"></i> @Model.Telefono
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No especificado</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-5">Email:</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.Email))
+                                    {
+                                        <a href="mailto:@Model.Email" class="text-decoration-none">
+                                            <i class="fas fa-envelope text-primary"></i> @Model.Email
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No especificado</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <!-- Información del Gimnasio -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-dumbbell"></i> Información del Gimnasio
+                            </h5>
+
+                            <dl class="row">
+                                <dt class="col-sm-5">Fecha Inscripción:</dt>
+                                <dd class="col-sm-7">@Model.FechaInscripcion.ToString("dd/MM/yyyy")</dd>
+
+                                <dt class="col-sm-5">Días como miembro:</dt>
+                                <dd class="col-sm-7">@((DateTime.Now - Model.FechaInscripcion).Days) días</dd>
+
+                                <dt class="col-sm-5">Estado:</dt>
+                                <dd class="col-sm-7">
+                                    @if (Model.EstaActivo)
+                                    {
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check"></i> Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-times"></i> Inactivo
+                                        </span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+
+                        <!-- Información Adicional -->
+                        <div class="col-md-6">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-info-circle"></i> Información Adicional
+                            </h5>
+
+                            <dl class="row">
+                                <dt class="col-sm-5">Contacto Emergencia:</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.ContactoEmergencia))
+                                    {
+                                        @Model.ContactoEmergencia
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No especificado</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-5">Observaciones Médicas:</dt>
+                                <dd class="col-sm-7">
+                                    @if (!string.IsNullOrEmpty(Model.ObservacionesMedicas))
+                                    {
+                                        <div class="alert alert-warning small" role="alert">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            @Model.ObservacionesMedicas
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Ninguna</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="card-footer">
+                    <div class="btn-group" role="group">
+                        <a asp-action="Edit" asp-route-id="@Model.Id"
+                           class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@Model.Id"
+                           class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al listado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

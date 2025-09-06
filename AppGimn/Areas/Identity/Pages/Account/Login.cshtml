@@ -1,0 +1,68 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm p-4 border-0 rounded-3">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">@ViewData["Title"]</h2>
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <form id="account" method="post">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+                        <label asp-for="Input.Email">Email</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="contraseña" />
+                        <label asp-for="Input.Password">Contraseña</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <label class="form-check-label" asp-for="Input.RememberMe">
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary rounded-pill">Entrar</button>
+                </form>
+                <div class="d-flex justify-content-between mt-3">
+                    <a id="forgot-password" asp-page="./ForgotPassword" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none">Registrarse como nuevo usuario</a>
+                </div>
+                <hr />
+                @{
+                    if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                    {
+                        <div>
+                            <p class="text-center">
+                                No hay servicios de autenticación externos configurados.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <div>
+                                <p>
+                                    @foreach (var provider in Model.ExternalLogins!)
+                                    {
+                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Inicia sesión usando tu cuenta @provider.DisplayName">@provider.DisplayName</button>
+                                    }
+                                </p>
+                            </div>
+                        </form>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

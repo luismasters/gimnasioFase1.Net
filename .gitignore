@@ -1,0 +1,20 @@
+# Visual Studio
+.vs/
+
+# Binaries
+bin/
+obj/
+
+# Logs
+log/
+*.log
+
+# Packages
+**/packages/
+[Pp]ackages/
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg

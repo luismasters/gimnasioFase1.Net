@@ -1,0 +1,103 @@
+﻿@model IEnumerable<AppGimn.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<h2>👥 Listado de Clientes</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="fa fa-plus"></i> Nuevo Cliente
+    </a>
+</p>
+
+<!-- Búsqueda -->
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="buscar" value="@ViewData["FiltroActual"]"
+                       class="form-control" placeholder="Buscar por nombre, apellido o DNI..." />
+            </div>
+            <div class="col-md-2">
+                <input type="submit" value="Buscar" class="btn btn-outline-primary" />
+            </div>
+            <div class="col-md-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>¡Éxito!</strong> @TempData["MensajeExito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre Completo</th>
+                <th>DNI</th>
+                <th>Edad</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cliente in Model)
+            {
+                <tr class="@(cliente.EstaActivo ? "" : "table-secondary")">
+                    <td>@cliente.NombreCompleto</td>
+                    <td>@cliente.DNI</td>
+                    <td>@cliente.Edad años</td>
+                    <td>@(cliente.Telefono ?? "N/A")</td>
+                    <td>@(cliente.Email ?? "N/A")</td>
+                    <td>
+                        @if (cliente.EstaActivo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@cliente.Id"
+                           class="btn btn-info btn-sm">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@cliente.Id"
+                           class="btn btn-warning btn-sm">Editar</a>
+
+                        @if (cliente.EstaActivo)
+                        {
+                            <a asp-action="Delete" asp-route-id="@cliente.Id"
+                               class="btn btn-danger btn-sm">Eliminar</a>
+                        }
+                        else
+                        {
+                            <form asp-action="Reactivar" asp-route-id="@cliente.Id" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm">Reactivar</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <h4>No hay clientes registrados</h4>
+        <p>¡Crea el primer cliente haciendo clic en "Nuevo Cliente"!</p>
+    </div>
+}
