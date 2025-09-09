@@ -1,0 +1,300 @@
+﻿@model AppGimn.Models.Empleado
+
+@{
+    ViewData["Title"] = "Editar Empleado";
+    var cargosDisponibles = ViewData["CargosDisponibles"] as List<string>;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-edit"></i> Editar Empleado
+                    </h3>
+                    <small>Modificando datos de: <strong>@Model.NombreCompleto</strong></small>
+                </div>
+
+                <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="card-body">
+                        @* Mostrar errores generales *@
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Por favor corrige los siguientes errores:</strong>
+                                <div asp-validation-summary="ModelOnly" class="mb-0 mt-2"></div>
+                            </div>
+                        }
+
+                        <!-- Información Personal -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-id-card"></i> Información Personal
+                                </h5>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Nombre" class="form-label required">Nombre</label>
+                                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" required />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Apellido" class="form-label required">Apellido</label>
+                                    <input asp-for="Apellido" class="form-control" placeholder="Ingrese el apellido" required />
+                                    <span asp-validation-for="Apellido" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DNI" class="form-label required">DNI</label>
+                                    <input asp-for="DNI" class="form-control" placeholder="Ej: 12345678" required />
+                                    <span asp-validation-for="DNI" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> El DNI debe ser único
+                                    </div>
+                                </div>
+                            </div>
+
+              
+                        <!-- Información de Contacto -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-phone"></i> Información de Contacto
+                                </h5>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Telefono" class="form-label">Teléfono</label>
+                                    <input asp-for="Telefono" class="form-control" placeholder="Ej: 011-1234-5678" />
+                                    <span asp-validation-for="Telefono" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Email" class="form-label">Email</label>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="empleado@gimnasio.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        <!-- Información Laboral -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-briefcase"></i> Información Laboral
+                                </h5>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Cargo" class="form-label required">Cargo</label>
+                                    <select asp-for="Cargo" class="form-control" required>
+                                        <option value="">-- Seleccionar cargo --</option>
+                                        @if (cargosDisponibles != null)
+                                        {
+                                            foreach (var cargo in cargosDisponibles)
+                                            {
+                                                <option value="@cargo">@cargo</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Cargo" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Salario" class="form-label">Salario</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="Salario" type="number" class="form-control"
+                                               placeholder="0.00" min="0" step="0.01" />
+                                    </div>
+                                    <span asp-validation-for="Salario" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> Campo opcional
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="FechaIngreso" class="form-label required">Fecha de Ingreso</label>
+                                    <input asp-for="FechaIngreso" type="date" class="form-control" required />
+                                    <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+                                    <div class="form-text">
+                                        <i class="fas fa-calendar"></i>
+                                        Antigüedad: @Model.AntiguedadDias días
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Estado del Empleado</label>
+                                    <div class="form-check">
+                                        <input asp-for="EstaActivo" type="checkbox" class="form-check-input" id="estaActivo" />
+                                        <label class="form-check-label" for="estaActivo">
+                                            Empleado Activo
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Si desmarcas esta opción, el empleado aparecerá como inactivo
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información Adicional -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary border-bottom pb-2">
+                                    <i class="fas fa-notes-medical"></i> Información Adicional
+                                </h5>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                                    <textarea asp-for="Observaciones" class="form-control" rows="3"
+                                              placeholder="Notas adicionales sobre el empleado..."></textarea>
+                                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información de Permisos (Solo lectura) -->
+                        @if (Model.PuedeGestionarEmpleados || Model.PuedeVerReportes)
+                        {
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-info border-bottom pb-2">
+                                        <i class="fas fa-shield-alt"></i> Permisos por Cargo
+                                    </h6>
+                                    <div class="alert alert-info">
+                                        @if (Model.PuedeGestionarEmpleados)
+                                        {
+                                            <div><i class="fas fa-check text-success"></i> Puede gestionar empleados</div>
+                                        }
+                                        @if (Model.PuedeVerReportes)
+                                        {
+                                            <div><i class="fas fa-check text-success"></i> Puede ver reportes</div>
+                                        }
+                                        <small class="text-muted d-block mt-2">
+                                            Los permisos se asignan automáticamente según el cargo seleccionado
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info btn-lg">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                    <i class="fas fa-arrow-left"></i> Volver al Listado
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .required::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .border-bottom {
+        border-bottom: 2px solid #dee2e6 !important;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Validación del formulario con Bootstrap
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        // Auto-calcular antigüedad cuando cambia fecha de ingreso
+        document.getElementById('FechaIngreso').addEventListener('change', function() {
+            const fechaIngreso = new Date(this.value);
+            const hoy = new Date();
+            const diferencia = hoy - fechaIngreso;
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+
+            const infoText = document.querySelector('.form-text i.fas.fa-calendar').parentElement;
+            infoText.innerHTML = `<i class="fas fa-calendar"></i> Antigüedad: ${dias} días`;
+        });
+    </script>
+}

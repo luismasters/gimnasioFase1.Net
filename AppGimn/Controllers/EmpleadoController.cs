@@ -1,303 +1,226 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AppGimn.Data;
 using AppGimn.Models;
 
 namespace AppGimn.Controllers
 {
+    [Authorize] // Requiere estar logueado
     public class EmpleadoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Usuario> _userManager;
 
-        // Lista de cargos disponibles - podría venir de BD en el futuro
-        private readonly List<string> _cargosDisponibles = new()
-        {
-            "Recepcionista",
-            "Instructor",
-            "Personal Trainer",
-            "Gerente",
-            "Mantenimiento"
-        };
-
-        public EmpleadoController(ApplicationDbContext context)
+        public EmpleadoController(ApplicationDbContext context, UserManager<Usuario> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // ============ LISTAR EMPLEADOS ============
-        public async Task<IActionResult> Index(string buscar, string filtrarCargo)
+        // ✅ MÉTODO PARA VERIFICAR PERMISOS
+        private async Task<bool> PuedeGestionarEmpleados()
         {
-            ViewData["FiltroActual"] = buscar;
-            ViewData["FiltroCargo"] = filtrarCargo;
-            ViewData["CargosDisponibles"] = _cargosDisponibles;
+            var usuario = await _userManager.GetUserAsync(User);
+            if (usuario == null) return false;
 
-            IQueryable<Empleado> empleados = _context.Empleados.Where(e => e.EstaActivo);
+            // Si es Admin, puede todo
+            if (usuario.EsAdmin) return true;
 
-            // Filtro por búsqueda
-            if (!string.IsNullOrWhiteSpace(buscar))
-            {
-                empleados = empleados.Where(e =>
-                    e.Nombre.Contains(buscar) ||
-                    e.Apellido.Contains(buscar) ||
-                    e.DNI.Contains(buscar) ||
-                    e.Email.Contains(buscar));
-            }
+            // Si no es empleado del sistema, no puede
+            if (!usuario.EsEmpleado) return false;
 
-            // Filtro por cargo
-            if (!string.IsNullOrWhiteSpace(filtrarCargo) && filtrarCargo != "Todos")
-            {
-                empleados = empleados.Where(e => e.Cargo == filtrarCargo);
-            }
+            // Buscar datos del empleado por DNI
+            var empleado = await _context.Empleados
+                .FirstOrDefaultAsync(e => e.DNI == usuario.DNI);
 
-            // Ordenar por fecha de contratación (más recientes primero)
-            empleados = empleados.OrderByDescending(e => e.FechaIngreso);
+            if (empleado == null) return false;
 
-            return View(await empleados.ToListAsync());
+            // Solo Gerentes pueden gestionar empleados
+            return empleado.Cargo.Equals("Gerente", StringComparison.OrdinalIgnoreCase);
         }
 
-        // ============ VER DETALLES EMPLEADO ============
+        // ✅ INDEX - Lista de empleados
+        public async Task<IActionResult> Index()
+        {
+            // Verificar permisos
+            if (!await PuedeGestionarEmpleados())
+            {
+                TempData["Error"] = "No tienes permisos para gestionar empleados.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var empleados = await _context.Empleados.ToListAsync();
+            return View(empleados);
+        }
+
+        // ✅ DETAILS - Ver detalles
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarEmpleados())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para ver empleados.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id == null) return NotFound();
 
             var empleado = await _context.Empleados
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (empleado == null)
+            if (empleado == null) return NotFound();
+
+            return View(empleado);
+        }
+
+        // ✅ CREATE GET - Mostrar formulario
+        public async Task<IActionResult> Create()
+        {
+            if (!await PuedeGestionarEmpleados())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para crear empleados.";
+                return RedirectToAction("Index", "Home");
             }
 
-            return View(empleado);
+            return View();
         }
 
-        // ============ CREAR EMPLEADO - GET ============
-        public IActionResult Create()
-        {
-            ViewData["CargosDisponibles"] = _cargosDisponibles;
-
-            var empleado = new Empleado
-            {
-                FechaIngreso = DateTime.Now,
-                EstaActivo = true,
-                Salario = 0 // Se definirá según el cargo
-            };
-
-            return View(empleado);
-        }
-
-        // ============ CREAR EMPLEADO - POST ============
+        // ✅ CREATE POST - Procesar formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Empleado empleado)
+        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario")] Empleado empleado)
         {
-            if (ModelState.IsValid)
+            if (!await PuedeGestionarEmpleados())
             {
-                // Verificar que no existe otro empleado con el mismo DNI
-                var empleadoExistente = await _context.Empleados
-                    .FirstOrDefaultAsync(e => e.DNI == empleado.DNI);
-
-                if (empleadoExistente != null)
-                {
-                    ModelState.AddModelError("DNI", "Ya existe un empleado con ese DNI");
-                    ViewData["CargosDisponibles"] = _cargosDisponibles;
-                    return View(empleado);
-                }
-
-                // Validar que el cargo sea válido
-                if (!_cargosDisponibles.Contains(empleado.Cargo))
-                {
-                    ModelState.AddModelError("Cargo", "Cargo no válido");
-                    ViewData["CargosDisponibles"] = _cargosDisponibles;
-                    return View(empleado);
-                }
-
-                try
-                {
-                    _context.Add(empleado);
-                    await _context.SaveChangesAsync();
-
-                    TempData["MensajeExito"] = $"Empleado {empleado.NombreCompleto} ({empleado.Cargo}) creado exitosamente";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Error al guardar: {ex.Message}");
-                }
+                TempData["Error"] = "No tienes permisos para crear empleados.";
+                return RedirectToAction("Index", "Home");
             }
 
-            ViewData["CargosDisponibles"] = _cargosDisponibles;
+            if (ModelState.IsValid)
+            {
+                // Verificar DNI único
+                var existeEmpleado = await _context.Empleados
+                    .AnyAsync(e => e.DNI == empleado.DNI);
+
+                if (existeEmpleado)
+                {
+                    ModelState.AddModelError("DNI", "Ya existe un empleado con este DNI.");
+                    return View(empleado);
+                }
+
+                _context.Add(empleado);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Empleado creado exitosamente.";
+                return RedirectToAction(nameof(Index));
+            }
             return View(empleado);
         }
 
-        // ============ EDITAR EMPLEADO - GET ============
+        // ✅ EDIT GET - Mostrar formulario de edición
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarEmpleados())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para editar empleados.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id == null) return NotFound();
 
             var empleado = await _context.Empleados.FindAsync(id);
-            if (empleado == null)
-            {
-                return NotFound();
-            }
+            if (empleado == null) return NotFound();
 
-            ViewData["CargosDisponibles"] = _cargosDisponibles;
             return View(empleado);
         }
 
-        // ============ EDITAR EMPLEADO - POST ============
+        // ✅ EDIT POST - Procesar edición
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Empleado empleado)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario")] Empleado empleado)
         {
-            if (id != empleado.Id)
+            if (!await PuedeGestionarEmpleados())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para editar empleados.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id != empleado.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                // Verificar que no existe otro empleado con el mismo DNI (excepto él mismo)
-                var empleadoExistente = await _context.Empleados
-                    .FirstOrDefaultAsync(e => e.DNI == empleado.DNI && e.Id != empleado.Id);
-
-                if (empleadoExistente != null)
-                {
-                    ModelState.AddModelError("DNI", "Ya existe otro empleado con ese DNI");
-                    ViewData["CargosDisponibles"] = _cargosDisponibles;
-                    return View(empleado);
-                }
-
-                // Validar que el cargo sea válido
-                if (!_cargosDisponibles.Contains(empleado.Cargo))
-                {
-                    ModelState.AddModelError("Cargo", "Cargo no válido");
-                    ViewData["CargosDisponibles"] = _cargosDisponibles;
-                    return View(empleado);
-                }
-
                 try
                 {
+                    // Verificar DNI único (excepto el actual)
+                    var existeEmpleado = await _context.Empleados
+                        .AnyAsync(e => e.DNI == empleado.DNI && e.Id != empleado.Id);
+
+                    if (existeEmpleado)
+                    {
+                        ModelState.AddModelError("DNI", "Ya existe un empleado con este DNI.");
+                        return View(empleado);
+                    }
+
                     _context.Update(empleado);
                     await _context.SaveChangesAsync();
 
-                    TempData["MensajeExito"] = $"Empleado {empleado.NombreCompleto} actualizado exitosamente";
-                    return RedirectToAction(nameof(Index));
+                    TempData["Success"] = "Empleado actualizado exitosamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!EmpleadoExists(empleado.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Error al actualizar: {ex.Message}");
-                }
+                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["CargosDisponibles"] = _cargosDisponibles;
             return View(empleado);
         }
 
-        // ============ ELIMINAR EMPLEADO - GET ============
+        // ✅ DELETE GET - Confirmar eliminación
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarEmpleados())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para eliminar empleados.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id == null) return NotFound();
 
             var empleado = await _context.Empleados
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (empleado == null)
-            {
-                return NotFound();
-            }
+            if (empleado == null) return NotFound();
 
             return View(empleado);
         }
 
-        // ============ ELIMINAR EMPLEADO - POST ============
+        // ✅ DELETE POST - Procesar eliminación
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var empleado = await _context.Empleados.FindAsync(id);
+            if (!await PuedeGestionarEmpleados())
+            {
+                TempData["Error"] = "No tienes permisos para eliminar empleados.";
+                return RedirectToAction("Index", "Home");
+            }
 
+            var empleado = await _context.Empleados.FindAsync(id);
             if (empleado != null)
             {
-                // Borrado lógico (marcar como inactivo) - igual que Cliente
-                empleado.EstaActivo = false;
-                _context.Update(empleado);
+                _context.Empleados.Remove(empleado);
                 await _context.SaveChangesAsync();
-
-                TempData["MensajeExito"] = $"Empleado {empleado.NombreCompleto} desactivado exitosamente";
+                TempData["Success"] = "Empleado eliminado exitosamente.";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // ============ REACTIVAR EMPLEADO ============
-        [HttpPost]
-        public async Task<IActionResult> Reactivar(int id)
-        {
-            var empleado = await _context.Empleados.FindAsync(id);
-
-            if (empleado != null)
-            {
-                empleado.EstaActivo = true;
-                _context.Update(empleado);
-                await _context.SaveChangesAsync();
-
-                TempData["MensajeExito"] = $"Empleado {empleado.NombreCompleto} reactivado exitosamente";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ============ REPORTES BÁSICOS ============
-        public async Task<IActionResult> Reportes()
-        {
-            var empleadosActivos = await _context.Empleados
-                .Where(e => e.EstaActivo)
-                .ToListAsync();
-
-            var reporteBasico = new
-            {
-                TotalEmpleados = empleadosActivos.Count,
-                EmpleadosPorCargo = empleadosActivos
-                    .GroupBy(e => e.Cargo)
-                    .Select(g => new { Cargo = g.Key, Cantidad = g.Count() })
-                    .OrderByDescending(x => x.Cantidad)
-                    .ToList(),
-                PromedioSalario = empleadosActivos.Average(e => e.Salario),
-                SalarioTotal = empleadosActivos.Sum(e => e.Salario),
-                EmpleadoMasAntiguo = empleadosActivos
-                    .OrderBy(e => e.FechaIngreso)
-                    .FirstOrDefault(),
-                EmpleadoMasReciente = empleadosActivos
-                    .OrderByDescending(e => e.FechaIngreso)
-                    .FirstOrDefault()
-            };
-
-            ViewBag.Reporte = reporteBasico;
-            return View(empleadosActivos);
-        }
-
-        // ============ MÉTODOS AUXILIARES ============
+        // ✅ MÉTODO AUXILIAR
         private bool EmpleadoExists(int id)
         {
             return _context.Empleados.Any(e => e.Id == id);

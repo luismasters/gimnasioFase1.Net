@@ -1,236 +1,230 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AppGimn.Data;
 using AppGimn.Models;
 
 namespace AppGimn.Controllers
 {
+    [Authorize] // Requiere estar logueado
     public class ClienteController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Usuario> _userManager;
 
-        public ClienteController(ApplicationDbContext context)
+        public ClienteController(ApplicationDbContext context, UserManager<Usuario> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // ============ LISTAR CLIENTES ============
-        public async Task<IActionResult> Index(string buscar)
+        // ✅ MÉTODO PARA VERIFICAR PERMISOS
+        private async Task<bool> PuedeGestionarClientes()
         {
-            ViewData["FiltroActual"] = buscar;
+            var usuario = await _userManager.GetUserAsync(User);
+            if (usuario == null) return false;
 
-            IQueryable<Cliente> clientes;
+            // Si es Admin, puede todo
+            if (usuario.EsAdmin) return true;
 
-            if (!string.IsNullOrWhiteSpace(buscar))
-            {
-                // Usar el método que creaste en DbContext
-                clientes = _context.BuscarClientes(buscar);
-            }
-            else
-            {
-                // Solo clientes activos por defecto
-                clientes = _context.ClientesActivos;
-            }
+            // Si no es empleado del sistema, no puede gestionar clientes
+            if (!usuario.EsEmpleado) return false;
 
-            return View(await clientes.ToListAsync());
+            // Buscar datos del empleado por DNI
+            var empleado = await _context.Empleados
+                .FirstOrDefaultAsync(e => e.DNI == usuario.DNI);
+
+            if (empleado == null) return false;
+
+            // Gerentes y Recepcionistas pueden gestionar clientes
+            return empleado.Cargo.Equals("Gerente", StringComparison.OrdinalIgnoreCase) ||
+                   empleado.Cargo.Equals("Recepcionista", StringComparison.OrdinalIgnoreCase);
         }
 
-        // ============ VER DETALLES CLIENTE ============
+        // ✅ INDEX - Lista de clientes
+        public async Task<IActionResult> Index()
+        {
+            // Verificar permisos
+            if (!await PuedeGestionarClientes())
+            {
+                TempData["Error"] = "No tienes permisos para gestionar clientes.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var clientes = await _context.Clientes.ToListAsync();
+            return View(clientes);
+        }
+
+        // ✅ DETAILS - Ver detalles
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarClientes())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para ver clientes.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id == null) return NotFound();
 
             var cliente = await _context.Clientes
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (cliente == null)
+            if (cliente == null) return NotFound();
+
+            return View(cliente);
+        }
+
+        // ✅ CREATE GET - Mostrar formulario
+        public async Task<IActionResult> Create()
+        {
+            if (!await PuedeGestionarClientes())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para crear clientes.";
+                return RedirectToAction("Index", "Home");
             }
 
-            return View(cliente);
+            return View();
         }
 
-        // ============ CREAR CLIENTE - GET ============
-        public IActionResult Create()
-        {
-            var cliente = new Cliente
-            {
-                FechaInscripcion = DateTime.Now,
-                EstaActivo = true
-            };
-
-            return View(cliente);
-        }
-
-        // ============ CREAR CLIENTE - POST ============
+        // ✅ CREATE POST - Procesar formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Cliente cliente)
+        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,TipoMembresia")] Cliente cliente)
         {
+            if (!await PuedeGestionarClientes())
+            {
+                TempData["Error"] = "No tienes permisos para crear clientes.";
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
-                // Verificar que no existe otro cliente con el mismo DNI
-                var clienteExistente = await _context.Clientes
-                    .FirstOrDefaultAsync(c => c.DNI == cliente.DNI);
+                // Verificar DNI único
+                var existeCliente = await _context.Clientes
+                    .AnyAsync(c => c.DNI == cliente.DNI);
 
-                if (clienteExistente != null)
+                if (existeCliente)
                 {
-                    ModelState.AddModelError("DNI", "Ya existe un cliente con ese DNI");
+                    ModelState.AddModelError("DNI", "Ya existe un cliente con este DNI.");
                     return View(cliente);
                 }
 
-                try
-                {
-                    _context.Add(cliente);
-                    await _context.SaveChangesAsync();
+                _context.Add(cliente);
+                await _context.SaveChangesAsync();
 
-                    TempData["MensajeExito"] = $"Cliente {cliente.NombreCompleto} creado exitosamente";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Error al guardar: {ex.Message}");
-                }
+                TempData["Success"] = "Cliente creado exitosamente.";
+                return RedirectToAction(nameof(Index));
             }
-
             return View(cliente);
         }
 
-        // ============ EDITAR CLIENTE - GET ============
+        // ✅ EDIT GET - Mostrar formulario de edición
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarClientes())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para editar clientes.";
+                return RedirectToAction("Index", "Home");
             }
 
+            if (id == null) return NotFound();
+
             var cliente = await _context.Clientes.FindAsync(id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+            if (cliente == null) return NotFound();
 
             return View(cliente);
         }
 
-        // ============ EDITAR CLIENTE - POST ============
+        // ✅ EDIT POST - Procesar edición
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo")] Cliente cliente)
         {
-            if (id != cliente.Id)
+            if (!await PuedeGestionarClientes())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para editar clientes.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id != cliente.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                // Verificar que no existe otro cliente con el mismo DNI (excepto él mismo)
-                var clienteExistente = await _context.Clientes
-                    .FirstOrDefaultAsync(c => c.DNI == cliente.DNI && c.Id != cliente.Id);
-
-                if (clienteExistente != null)
-                {
-                    ModelState.AddModelError("DNI", "Ya existe otro cliente con ese DNI");
-                    return View(cliente);
-                }
-
                 try
                 {
+                    // Verificar DNI único (excepto el actual)
+                    var existeCliente = await _context.Clientes
+                        .AnyAsync(c => c.DNI == cliente.DNI && c.Id != cliente.Id);
+
+                    if (existeCliente)
+                    {
+                        ModelState.AddModelError("DNI", "Ya existe un cliente con este DNI.");
+                        return View(cliente);
+                    }
+
                     _context.Update(cliente);
                     await _context.SaveChangesAsync();
 
-                    TempData["MensajeExito"] = $"Cliente {cliente.NombreCompleto} actualizado exitosamente";
-                    return RedirectToAction(nameof(Index));
+                    TempData["Success"] = "Cliente actualizado exitosamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ClienteExists(cliente.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Error al actualizar: {ex.Message}");
-                }
+                return RedirectToAction(nameof(Index));
             }
-
             return View(cliente);
         }
 
-        // ============ ELIMINAR CLIENTE - GET ============
+        // ✅ DELETE GET - Confirmar eliminación
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (!await PuedeGestionarClientes())
             {
-                return NotFound();
+                TempData["Error"] = "No tienes permisos para eliminar clientes.";
+                return RedirectToAction("Index", "Home");
             }
+
+            if (id == null) return NotFound();
 
             var cliente = await _context.Clientes
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (cliente == null)
-            {
-                return NotFound();
-            }
+            if (cliente == null) return NotFound();
 
             return View(cliente);
         }
 
-        // ============ ELIMINAR CLIENTE - POST ============
+        // ✅ DELETE POST - Procesar eliminación
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            if (!await PuedeGestionarClientes())
+            {
+                TempData["Error"] = "No tienes permisos para eliminar clientes.";
+                return RedirectToAction("Index", "Home");
+            }
 
+            var cliente = await _context.Clientes.FindAsync(id);
             if (cliente != null)
             {
-                // Borrado lógico (marcar como inactivo)
-                cliente.EstaActivo = false;
-                _context.Update(cliente);
-
-                // Si querés borrado físico, usá esto en su lugar:
-                // _context.Clientes.Remove(cliente);
-
+                _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
-                TempData["MensajeExito"] = $"Cliente {cliente.NombreCompleto} eliminado exitosamente";
+                TempData["Success"] = "Cliente eliminado exitosamente.";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // ============ REACTIVAR CLIENTE ============
-        [HttpPost]
-        public async Task<IActionResult> Reactivar(int id)
-        {
-            var cliente = await _context.Clientes.FindAsync(id);
-
-            if (cliente != null)
-            {
-                cliente.EstaActivo = true;
-                _context.Update(cliente);
-                await _context.SaveChangesAsync();
-
-                TempData["MensajeExito"] = $"Cliente {cliente.NombreCompleto} reactivado exitosamente";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // ============ MÉTODOS AUXILIARES ============
+        // ✅ MÉTODO AUXILIAR
         private bool ClienteExists(int id)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return _context.Clientes.Any(c => c.Id == id);
         }
     }
 }

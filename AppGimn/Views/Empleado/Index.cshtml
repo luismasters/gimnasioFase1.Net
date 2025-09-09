@@ -1,0 +1,302 @@
+﻿@model IEnumerable<AppGimn.Models.Empleado>
+
+@{
+    ViewData["Title"] = "Empleados";
+    var filtroActual = ViewData["FiltroActual"] as string;
+    var filtroCargo = ViewData["FiltroCargo"] as string;
+    var cargosDisponibles = ViewData["CargosDisponibles"] as List<string>;
+}
+
+<div class="container mt-4">
+    @* Mensajes de éxito/error *@
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["MensajeExito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-users"></i> Gestión de Empleados
+                            </h3>
+                            <small class="text-light">Total: @Model.Count() empleado(s)</small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="Create" class="btn btn-success">
+                                <i class="fas fa-user-plus"></i> Nuevo Empleado
+                            </a>
+                            <a asp-action="Reportes" class="btn btn-info">
+                                <i class="fas fa-chart-bar"></i> Reportes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card-body pb-0">
+                    <form method="get" class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="fas fa-search"></i> Buscar empleado
+                            </label>
+                            <input type="text" name="buscar" class="form-control"
+                                   value="@filtroActual" placeholder="Nombre, apellido, DNI o email..." />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">
+                                <i class="fas fa-briefcase"></i> Filtrar por cargo
+                            </label>
+                            <select name="filtrarCargo" class="form-control">
+                                <option value="">Todos los cargos</option>
+                                @if (cargosDisponibles != null)
+                                {
+                                    foreach (var cargo in cargosDisponibles)
+                                    {
+                                        <option value="@cargo" selected="@(filtroCargo == cargo)">
+                                            @cargo
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Limpiar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tabla de empleados -->
+                <div class="card-body pt-0">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-user"></i> Empleado</th>
+                                        <th><i class="fas fa-briefcase"></i> Cargo</th>
+                                        <th><i class="fas fa-dollar-sign"></i> Salario</th>
+                                        <th><i class="fas fa-calendar"></i> Contratación</th>
+                                        <th><i class="fas fa-phone"></i> Contacto</th>
+                                        <th><i class="fas fa-toggle-on"></i> Estado</th>
+                                        <th class="text-center"><i class="fas fa-cog"></i> Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var empleado in Model)
+                                    {
+                                        <tr class="@(empleado.EstaActivo ? "" : "table-secondary")">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle bg-primary text-white me-2">
+                                                        @empleado.Nombre.First()@empleado.Apellido.First()
+                                                    </div>
+                                                    <div>
+                                                        <strong>@empleado.NombreCompleto</strong><br>
+                                                        <small class="text-muted">DNI: @empleado.DNI</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <span class="badge badge-@GetCargoColor(empleado.Cargo)">
+                                                    @empleado.Cargo
+                                                </span>
+                                                @if (empleado.PuedeGestionarEmpleados)
+                                                {
+                                                    <br>
+                                        
+                                                    <small class="text-primary">
+                                                        <i class="fas fa-crown"></i> Admin
+                                                    </small>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                <strong>@empleado.Salario.ToString()</strong>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    @empleado.FechaIngreso.ToString("dd/MM/yyyy")<br>
+                                                    <small class="text-muted">
+                                                        @empleado.AntiguedadDias días
+                                                    </small>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(empleado.Telefono))
+                                                {
+                                                    <a href="tel:@empleado.Telefono" class="text-decoration-none">
+                                                        <i class="fas fa-phone text-success"></i>
+                                                    </a>
+                                                }
+
+                                                @if (!string.IsNullOrEmpty(empleado.Email))
+                                                {
+                                                    <a href="mailto:@empleado.Email" class="text-decoration-none">
+                                                        <i class="fas fa-envelope text-primary"></i>
+                                                    </a>
+                                                }
+
+                                                @if (string.IsNullOrEmpty(empleado.Telefono) && string.IsNullOrEmpty(empleado.Email))
+                                                {
+                                                    <span class="text-muted">Sin datos</span>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                @if (empleado.EstaActivo)
+                                                {
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-check"></i> Activo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-secondary">
+                                                        <i class="fas fa-times"></i> Inactivo
+                                                    </span>
+                                                    <form asp-action="Reactivar" method="post" class="d-inline mt-1">
+                                                        <input type="hidden" name="id" value="@empleado.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Reactivar">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </td>
+
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Details" asp-route-id="@empleado.Id"
+                                                       class="btn btn-outline-info" title="Ver detalles">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    @if (empleado.EstaActivo)
+                                                    {
+                                                        <a asp-action="Edit" asp-route-id="@empleado.Id"
+                                                           class="btn btn-outline-warning" title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+
+                                                        <a asp-action="Delete" asp-route-id="@empleado.Id"
+                                                           class="btn btn-outline-danger" title="Desactivar">
+                                                            <i class="fas fa-user-slash"></i>
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-users-slash fa-3x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No se encontraron empleados</h5>
+                            @if (!string.IsNullOrWhiteSpace(filtroActual) || !string.IsNullOrWhiteSpace(filtroCargo))
+                            {
+                                <p class="text-muted">
+                                    Intente con otros criterios de búsqueda o
+                                    <a asp-action="Index" class="text-decoration-none">ver todos los empleados</a>
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">
+                                    <a asp-action="Create" class="btn btn-success">
+                                        <i class="fas fa-user-plus"></i> Registrar primer empleado
+                                    </a>
+                                </p>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetCargoColor(string cargo)
+    {
+        return cargo switch
+        {
+            "Gerente" => "danger",
+            "Personal Trainer" => "warning",
+            "Instructor" => "info",
+            "Recepcionista" => "success",
+            "Mantenimiento" => "secondary",
+            _ => "primary"
+        };
+    }
+}
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .badge {
+        font-size: 0.8em;
+        padding: 4px 8px;
+    }
+
+    .badge-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+</style>

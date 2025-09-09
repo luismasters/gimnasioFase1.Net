@@ -69,5 +69,51 @@ namespace AppGimn.Data
                 e.Cargo.ToLower().Contains(termino))
                 .OrderBy(e => e.Apellido);
         }
+
+        // ============ MÉTODOS PARA VINCULAR USUARIO-EMPLEADO ============
+        // Agregar estos métodos a tu ApplicationDbContext
+
+        /// <summary>
+        /// Busca el empleado vinculado a un usuario por DNI
+        /// </summary>
+        public async Task<Empleado?> ObtenerEmpleadoPorUsuario(Usuario usuario)
+        {
+            if (string.IsNullOrEmpty(usuario.DNI))
+                return null;
+
+            return await Empleados
+                .FirstOrDefaultAsync(e => e.DNI == usuario.DNI && e.EstaActivo);
+        }
+
+        /// <summary>
+        /// Verifica si un usuario tiene un empleado vinculado
+        /// </summary>
+        public async Task<bool> UsuarioTieneEmpleado(Usuario usuario)
+        {
+            if (string.IsNullOrEmpty(usuario.DNI))
+                return false;
+
+            return await Empleados
+                .AnyAsync(e => e.DNI == usuario.DNI && e.EstaActivo);
+        }
+
+        /// <summary>
+        /// Obtiene todos los empleados que NO tienen usuario vinculado
+        /// </summary>
+        public IQueryable<Empleado> EmpleadosSinUsuario =>
+            Empleados.Where(e => e.EstaActivo && !Users.Any(u => u.DNI == e.DNI));
+
+        /// <summary>
+        /// Obtiene todos los usuarios que NO tienen empleado vinculado
+        /// </summary>
+        public IQueryable<Usuario> UsuariosSinEmpleado =>
+            Users.Where(u => !string.IsNullOrEmpty(u.DNI) &&
+                             u.EsEmpleado &&
+                             !Empleados.Any(e => e.DNI == u.DNI && e.EstaActivo));
+
+
+
+
+
     }
 }

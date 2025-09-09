@@ -7,41 +7,260 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AppGimn.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AppGimn</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-dumbbell"></i> AppGimn
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <!-- Dashboard para empleados y admins -->
+                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "EsEmpleado" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Dashboard" asp-action="Index">
+                                                <i class="fas fa-chart-line"></i> Resumen General
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Dashboard" asp-action="Estadisticas">
+                                                <i class="fas fa-chart-bar"></i> Estadísticas
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- Gestión de Clientes (Gerente/Recepcionista/Admin) -->
+                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "PuedeGestionarClientes" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-users"></i> Clientes
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Index">
+                                                <i class="fas fa-list"></i> Ver Clientes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Create">
+                                                <i class="fas fa-user-plus"></i> Nuevo Cliente
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Buscar">
+                                                <i class="fas fa-search"></i> Buscar Cliente
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- Gestión de Empleados (Solo Gerente/Admin) -->
+                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "PuedeGestionarEmpleados" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-tie"></i> Empleados
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Index">
+                                                <i class="fas fa-list"></i> Ver Empleados
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Create">
+                                                <i class="fas fa-user-plus"></i> Nuevo Empleado
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Reportes">
+                                                <i class="fas fa-file-alt"></i> Reportes
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            <!-- Mi Perfil (Para todos los usuarios logueados) -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user"></i> Mi Perfil
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fas fa-user-edit"></i> Ver Perfil
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                            <i class="fas fa-key"></i> Cambiar Contraseña
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
-                    <partial name="_LoginPartial" />
+
+                    <!-- Botones de autenticación -->
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle"></i>
+                                    @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <h6 class="dropdown-header">
+                                            <i class="fas fa-info-circle"></i> Tu Rol:
+                                            @if (User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                                            {
+                                                <span class="badge bg-danger">Administrador</span>
+                                            }
+                                            else if (User.Claims.Any(c => c.Type == "EsEmpleado" && c.Value == "True"))
+                                            {
+                                                <span class="badge bg-warning">Empleado</span>
+                                            }
+                                            else if (User.Claims.Any(c => c.Type == "EsCliente" && c.Value == "True"))
+                                            {
+                                                <span class="badge bg-success">Cliente</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Usuario</span>
+                                            }
+                                        </h6>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus"></i> Registrarse
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
+
+    <!-- Breadcrumb -->
+    @if (ViewData["Breadcrumb"] != null)
+    {
+        <div class="container mt-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    @Html.Raw(ViewData["Breadcrumb"])
+                </ol>
+            </nav>
+        </div>
+    }
+
+    <!-- Mensajes Globales -->
+    <div class="container mt-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> @TempData["Warning"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Info"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i> @TempData["Info"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+    </div>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="bg-dark text-light py-4 mt-5">
         <div class="container">
-            &copy; 2025 - AppGimn - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-dumbbell"></i> AppGimn</h5>
+                    <p class="mb-0">Sistema de gestión integral para gimnasios</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        &copy; 2025 AppGimn - Todos los derechos reservados
+                    </small>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

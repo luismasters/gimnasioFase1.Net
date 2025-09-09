@@ -1,0 +1,308 @@
+﻿@model AppGimn.Models.Empleado
+
+@{
+    ViewData["Title"] = "Nuevo Empleado";
+    var cargosDisponibles = ViewData["CargosDisponibles"] as List<string>;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-plus"></i> Registrar Nuevo Empleado
+                    </h3>
+                    <small class="text-light">Complete todos los campos obligatorios (*)</small>
+                </div>
+
+                <form asp-action="Create" method="post">
+                    <div class="card-body">
+
+                        <!-- Información Personal -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-user"></i> Información Personal
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Nombre" class="form-label">
+                                        <i class="fas fa-user"></i> Nombre <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Apellido" class="form-label">
+                                        <i class="fas fa-user"></i> Apellido <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Apellido" class="form-control" placeholder="Ingrese el apellido" />
+                                    <span asp-validation-for="Apellido" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="DNI" class="form-label">
+                                        <i class="fas fa-id-card"></i> DNI <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="DNI" class="form-control" placeholder="12345678"
+                                           maxlength="8" pattern="[0-9]{7,8}" />
+                                    <span asp-validation-for="DNI" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Cargo" class="form-label">
+                                        <i class="fas fa-briefcase"></i> Cargo <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="Cargo" class="form-control" id="cargoSelect" onchange="ajustarSalarioSugerido()">
+                                        <option value="">-- Seleccione un cargo --</option>
+                                        @if (cargosDisponibles != null)
+                                        {
+                                            foreach (var cargo in cargosDisponibles)
+                                            {
+                                                <option value="@cargo">@cargo</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="Cargo" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Información Laboral -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-building"></i> Información Laboral
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="FechaIngreso" class="form-label">
+                                        <i class="fas fa-calendar-plus"></i> Fecha de Contratación <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="FechaIngreso" type="date" class="form-control"
+                                           value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                    <span asp-validation-for="FechaIngreso" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Por defecto es la fecha actual
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Salario" class="form-label">
+                                        <i class="fas fa-dollar-sign"></i> Salario Mensual <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="Salario" type="number" class="form-control"
+                                               placeholder="0.00" step="0.01" min="0" id="salarioInput" />
+                                    </div>
+                                    <span asp-validation-for="Salario" class="text-danger"></span>
+                                    <small id="salarioSugerido" class="form-text text-info" style="display: none;">
+                                        <i class="fas fa-lightbulb"></i> <span id="textoSugerencia"></span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-toggle-on"></i> Estado del Empleado
+                                    </label>
+                                    <div class="form-check">
+                                        <input asp-for="EstaActivo" type="checkbox" class="form-check-input"
+                                               id="estaActivo" checked />
+                                        <label class="form-check-label" for="estaActivo">
+                                            Empleado Activo
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Normalmente se marca como activo al crear un empleado
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Información de Contacto -->
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-phone"></i> Información de Contacto
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Telefono" class="form-label">
+                                        <i class="fas fa-phone"></i> Teléfono
+                                    </label>
+                                    <input asp-for="Telefono" type="tel" class="form-control"
+                                           placeholder="Ej: 11-1234-5678" />
+                                    <span asp-validation-for="Telefono" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope"></i> Email Corporativo
+                                    </label>
+                                    <input asp-for="Email" type="email" class="form-control"
+                                           placeholder="empleado@gimnasio.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Email para comunicación interna
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen de Permisos por Cargo -->
+                        <div class="mt-4" id="permisosCargo" style="display: none;">
+                            <div class="alert alert-info" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-key"></i> Permisos del Cargo Seleccionado
+                                </h6>
+                                <ul id="listaPermisos" class="mb-0"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Resumen de validación -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-success btn-block">
+                                    <i class="fas fa-user-plus"></i> Registrar Empleado
+                                </button>
+                            </div>
+
+                            <div class="col-md-6">
+                                <a asp-action="Index" class="btn btn-secondary btn-block">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Los campos marcados con (*) son obligatorios
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Sugerencias de salario y permisos por cargo
+        const infoCargosSalarios = {
+            'Recepcionista': {
+                salario: 45000,
+                permisos: [
+                    'Gestionar clientes (alta, baja, modificación)',
+                    'Consultar información de membresías',
+                    'Procesar pagos y renovaciones',
+                    'Acceso al sistema durante horario laboral'
+                ]
+            },
+            'Instructor': {
+                salario: 50000,
+                permisos: [
+                    'Consultar información de clientes',
+                    'Registrar rutinas de ejercicios',
+                    'Ver horarios y disponibilidad',
+                    'Acceso a área de entrenamiento'
+                ]
+            },
+            'Personal Trainer': {
+                salario: 60000,
+                permisos: [
+                    'Gestionar clientes asignados',
+                    'Crear planes de entrenamiento personalizados',
+                    'Seguimiento de progreso de clientes',
+                    'Acceso completo a equipamiento'
+                ]
+            },
+            'Gerente': {
+                salario: 80000,
+                permisos: [
+                    'Gestionar empleados (alta, baja, modificación)',
+                    'Gestionar todos los clientes',
+                    'Ver reportes financieros y estadísticas',
+                    'Configuración general del sistema',
+                    'Acceso completo a todas las funciones'
+                ]
+            },
+            'Mantenimiento': {
+                salario: 40000,
+                permisos: [
+                    'Consultar equipamiento y estado',
+                    'Registrar tareas de mantenimiento',
+                    'Ver calendario de mantenimiento',
+                    'Acceso a todas las instalaciones'
+                ]
+            }
+        };
+
+        function ajustarSalarioSugerido() {
+            const cargoSeleccionado = document.getElementById('cargoSelect').value;
+            const salarioInput = document.getElementById('salarioInput');
+            const salarioSugerido = document.getElementById('salarioSugerido');
+            const textoSugerencia = document.getElementById('textoSugerencia');
+            const permisosCargo = document.getElementById('permisosCargo');
+            const listaPermisos = document.getElementById('listaPermisos');
+
+            if (cargoSeleccionado && infoCargosSalarios[cargoSeleccionado]) {
+                const info = infoCargosSalarios[cargoSeleccionado];
+
+                // Mostrar sugerencia de salario
+                textoSugerencia.textContent = `Salario sugerido para ${cargoSeleccionado}: $${info.salario.toLocaleString()}`;
+                salarioSugerido.style.display = 'block';
+
+                // Autocompletar salario si está vacío
+                if (!salarioInput.value || salarioInput.value == '0') {
+                    salarioInput.value = info.salario;
+                }
+
+                // Mostrar permisos del cargo
+                listaPermisos.innerHTML = info.permisos.map(permiso => `<li>${permiso}</li>`).join('');
+                permisosCargo.style.display = 'block';
+            } else {
+                salarioSugerido.style.display = 'none';
+                permisosCargo.style.display = 'none';
+            }
+        }
+
+        // Ejecutar al cargar la página por si ya hay un cargo seleccionado
+        document.addEventListener('DOMContentLoaded', function() {
+            ajustarSalarioSugerido();
+        });
+    </script>
+}
