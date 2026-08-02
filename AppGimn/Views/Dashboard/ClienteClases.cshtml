@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Reserva de Clases Grupales - AppGimn";
+}
+
+<!-- SUB-BARRA DE NAVEGACIÓN EXCLUSIVA PARA EL CLIENTE -->
+<div class="bg-dark border-bottom border-secondary py-2 mb-4">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="saas-badge saas-badge-purple">
+                    <i class="bi bi-calendar-check-fill me-1"></i> RESERVA DE CLASES
+                </span>
+                <span class="text-white fw-bold d-none d-md-inline">AURA FITNESS CLUB</span>
+            </div>
+            <div class="nav nav-pills gap-1">
+                <a asp-controller="Dashboard" asp-action="ClientePanel" class="nav-link btn-secondary-saas text-white btn-sm px-3">
+                    <i class="bi bi-house-door me-1"></i> Mi Inicio
+                </a>
+                <a asp-controller="Dashboard" asp-action="ClienteRutinas" class="nav-link btn-secondary-saas text-white btn-sm px-3">
+                    <i class="bi bi-journal-bookmark me-1"></i> Mis Rutinas
+                </a>
+                <a asp-controller="Dashboard" asp-action="ClienteEvolucion" class="nav-link btn-secondary-saas text-white btn-sm px-3">
+                    <i class="bi bi-graph-up-arrow me-1"></i> Mi Evolución
+                </a>
+                <a asp-controller="Dashboard" asp-action="ClienteClases" class="nav-link active bg-purple text-white btn-sm px-3">
+                    <i class="bi bi-calendar-check me-1"></i> Reservar Clases
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-white mb-1">
+                <i class="bi bi-calendar-range text-primary me-2"></i>Cartelera de Clases y Reservas
+            </h2>
+            <p class="text-secondary small mb-0">Reserva tu cupo para las actividades del día en Aura Fitness Club</p>
+        </div>
+        <div class="saas-card px-3 py-2 text-white small fw-semibold">
+            <i class="bi bi-ticket-perforated-fill text-warning me-1"></i> Créditos Disponibles: <strong>Ilimitados (Pase Premium)</strong>
+        </div>
+    </div>
+
+    <!-- TARJETAS VISUALES DE CLASES CON FOTOGRAFÍA -->
+    <div class="row g-4">
+        <!-- CLASE 1: PILATES REFORMER -->
+        <div class="col-md-6 col-lg-4">
+            <div class="saas-card overflow-hidden h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="position-relative">
+                        <img src="~/images/landing/group_classes.jpg" alt="Pilates Reformer" class="img-16-9" style="height: 200px; object-fit: cover;" />
+                        <span class="position-absolute top-0 end-0 m-3 saas-badge saas-badge-success">HOY 18:00 HS</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-1">Pilates Reformer & Postura</h4>
+                        <p class="text-secondary small mb-3">Instructora: Elena Rostova | Salón Principal A</p>
+                        
+                        <div class="d-flex align-items-center justify-content-between mb-2 small text-muted">
+                            <span>Cupos ocupados:</span>
+                            <span class="text-white fw-bold">14 / 18 lugares</span>
+                        </div>
+                        <div class="progress bg-dark mb-3" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: 77%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 pt-0">
+                    <button class="btn btn-purple w-100" onclick="alert('¡Lugar reservado con éxito para Pilates Reformer (18:00 hs)!')">
+                        <i class="bi bi-check-circle-fill me-1"></i> Reservar Mi Lugar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLASE 2: CARDIO BIOMÉTRICO HIIT -->
+        <div class="col-md-6 col-lg-4">
+            <div class="saas-card overflow-hidden h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="position-relative">
+                        <img src="~/images/landing/cardio_area.jpg" alt="Cardio HIIT" class="img-16-9" style="height: 200px; object-fit: cover;" />
+                        <span class="position-absolute top-0 end-0 m-3 saas-badge saas-badge-purple">HOY 19:30 HS</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-1">HIIT & Intervalos Biométricos</h4>
+                        <p class="text-secondary small mb-3">Instructor: Lucas Rodríguez | Zona Cardio 360°</p>
+
+                        <div class="d-flex align-items-center justify-content-between mb-2 small text-muted">
+                            <span>Cupos ocupados:</span>
+                            <span class="text-white fw-bold">10 / 15 lugares</span>
+                        </div>
+                        <div class="progress bg-dark mb-3" style="height: 6px;">
+                            <div class="progress-bar bg-purple" style="width: 66%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 pt-0">
+                    <button class="btn btn-purple w-100" onclick="alert('¡Lugar reservado con éxito para HIIT & Intervalos Biométricos (19:30 hs)!')">
+                        <i class="bi bi-check-circle-fill me-1"></i> Reservar Mi Lugar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLASE 3: SPINNING CYCLING -->
+        <div class="col-md-6 col-lg-4">
+            <div class="saas-card overflow-hidden h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="position-relative">
+                        <img src="~/images/landing/aura_hero.jpg" alt="Spinning" class="img-16-9" style="height: 200px; object-fit: cover;" />
+                        <span class="position-absolute top-0 end-0 m-3 saas-badge saas-badge-purple">MAÑANA 08:00 HS</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-1">Pro Cycling & Endurance</h4>
+                        <p class="text-secondary small mb-3">Instructor: Marcus Vance | Salón de Spinning</p>
+
+                        <div class="d-flex align-items-center justify-content-between mb-2 small text-muted">
+                            <span>Cupos ocupados:</span>
+                            <span class="text-white fw-bold">8 / 20 lugares</span>
+                        </div>
+                        <div class="progress bg-dark mb-3" style="height: 6px;">
+                            <div class="progress-bar bg-info" style="width: 40%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 pt-0">
+                    <button class="btn btn-purple w-100" onclick="alert('¡Lugar reservado con éxito para Pro Cycling (Mañana 08:00 hs)!')">
+                        <i class="bi bi-check-circle-fill me-1"></i> Reservar Mi Lugar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

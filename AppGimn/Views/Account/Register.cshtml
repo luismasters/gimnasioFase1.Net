@@ -1,86 +1,108 @@
-﻿@model AppGimn.Models.RegistroExtendidoViewModel
+@model AppGimn.Models.RegistroExtendidoViewModel
 @{
-    ViewData["Title"] = "Registrarse - Sistema Gimnasio";
+    ViewData["Title"] = "Crear Cuenta - AppGimn Premium";
 }
 
-<div class="row justify-content-center">
+<div class="row justify-content-center py-5">
     <div class="col-md-8 col-lg-6">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title mb-0">
-                    <i class="fas fa-user-plus"></i> Crear Cuenta
-                </h3>
-            </div>
-            <div class="card-body">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
-
-                    <!-- Email -->
-                    <div class="form-group mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <!-- DNI -->
-                    <div class="form-group mb-3">
-                        <label asp-for="DNI" class="form-label"></label>
-                        <input asp-for="DNI" class="form-control" placeholder="12345678" />
-                        <small class="form-text text-muted">
-                            Debe coincidir con tu DNI registrado como cliente o empleado
-                        </small>
-                        <span asp-validation-for="DNI" class="text-danger"></span>
-                    </div>
-
-                    <!-- Roles -->
-                    <div class="form-group mb-3">
-                        <label class="form-label">¿Cuál es tu relación con el gimnasio?</label>
-                        <div class="form-check">
-                            <input asp-for="EsCliente" class="form-check-input" />
-                            <label asp-for="EsCliente" class="form-check-label">
-                                Soy cliente del gimnasio
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input asp-for="EsEmpleado" class="form-check-input" />
-                            <label asp-for="EsEmpleado" class="form-check-label">
-                                Soy empleado del gimnasio
-                            </label>
-                        </div>
-                        <small class="form-text text-muted">
-                            Puedes seleccionar ambos si eres cliente Y empleado
-                        </small>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-group mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="form-group mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" class="form-control" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-user-plus"></i> Crear Cuenta
-                        </button>
-                    </div>
-                </form>
-
-                <hr />
-
-                <div class="text-center">
-                    <p class="mb-0">
-                        ¿Ya tienes cuenta?
-                        <a asp-action="Login" class="text-decoration-none">Iniciar Sesión</a>
-                    </p>
+        <div class="saas-card p-4 p-md-5">
+            <!-- LOGO Y ENCABEZADO -->
+            <div class="text-center mb-4">
+                <div class="brand-badge-purple mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                    <i class="bi bi-person-plus-fill"></i>
                 </div>
+                <h3 class="fw-bold text-white mb-1">Crear Cuenta de Usuario</h3>
+                <p class="text-secondary small">Vincúlate con tu DNI como cliente o empleado del gimnasio</p>
+            </div>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <!-- EMAIL -->
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        <i class="bi bi-envelope text-primary me-1"></i> Correo Electrónico
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted">
+                            <i class="bi bi-at"></i>
+                        </span>
+                        <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <!-- DNI -->
+                <div class="mb-3">
+                    <label asp-for="DNI" class="form-label">
+                        <i class="bi bi-card-heading text-primary me-1"></i> Número de DNI
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted">
+                            <i class="bi bi-person-vcard"></i>
+                        </span>
+                        <input asp-for="DNI" class="form-control" placeholder="12345678" />
+                    </div>
+                    <div class="form-text text-muted small mt-1">
+                        Debe coincidir con tu DNI de cliente o empleado registrado en el sistema.
+                    </div>
+                    <span asp-validation-for="DNI" class="text-danger small"></span>
+                </div>
+
+                <!-- RELACIÓN CON EL GIMNASIO (ROLES) -->
+                <div class="saas-card p-3 mb-3" style="background-color: var(--bg-surface-variant);">
+                    <label class="form-label text-white fw-bold mb-2">
+                        <i class="bi bi-diagram-3 text-primary me-1"></i> ¿Cuál es tu relación con el gimnasio?
+                    </label>
+                    <div class="form-check mb-2">
+                        <input asp-for="EsCliente" class="form-check-input bg-dark border-secondary" />
+                        <label asp-for="EsCliente" class="form-check-label text-white small">
+                            Soy cliente / alumno del gimnasio
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="EsEmpleado" class="form-check-input bg-dark border-secondary" />
+                        <label asp-for="EsEmpleado" class="form-check-label text-white small">
+                            Soy empleado / personal del gimnasio
+                        </label>
+                    </div>
+                </div>
+
+                <!-- CONTRASEÑA -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-lock text-primary me-1"></i> Contraseña
+                        </label>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label">
+                            <i class="bi bi-shield-check text-primary me-1"></i> Confirmar
+                        </label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- BOTÓN CREAR CUENTA -->
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-purple btn-lg py-3">
+                        <i class="bi bi-person-plus-fill me-1"></i> Registrarse Ahora
+                    </button>
+                </div>
+            </form>
+
+            <hr class="border-secondary opacity-25 my-4" />
+
+            <div class="text-center small">
+                <p class="text-secondary mb-0">
+                    ¿Ya tienes una cuenta registrada?
+                    <a asp-action="Login" class="text-decoration-none fw-bold" style="color: var(--primary-light);">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                    </a>
+                </p>
             </div>
         </div>
     </div>

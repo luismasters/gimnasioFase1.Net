@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -41,8 +41,8 @@ namespace AppGimn.Controllers
             return empleado.Cargo.Equals("Gerente", StringComparison.OrdinalIgnoreCase);
         }
 
-        // ✅ INDEX - Lista de empleados
-        public async Task<IActionResult> Index()
+        // ✅ INDEX - Lista de empleados con filtrado y búsqueda
+        public async Task<IActionResult> Index(string? buscar, string? cargo)
         {
             // Verificar permisos
             if (!await PuedeGestionarEmpleados())
@@ -51,7 +51,41 @@ namespace AppGimn.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var empleados = await _context.Empleados.ToListAsync();
+            // Cargar lista de cargos para el filtro desplegable
+            ViewData["CargosDisponibles"] = await _context.Empleados
+                .Where(e => !string.IsNullOrEmpty(e.Cargo))
+                .Select(e => e.Cargo)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            ViewData["FiltroActual"] = buscar;
+            ViewData["FiltroCargo"] = cargo;
+
+            IQueryable<Empleado> query = _context.Empleados;
+
+            // Filtro por término de búsqueda (Nombre, Apellido, DNI, Email)
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                var termino = buscar.Trim().ToLower();
+                query = query.Where(e =>
+                    e.Nombre.ToLower().Contains(termino) ||
+                    e.Apellido.ToLower().Contains(termino) ||
+                    e.DNI.Contains(termino) ||
+                    (e.Email != null && e.Email.ToLower().Contains(termino)));
+            }
+
+            // Filtro por cargo específico
+            if (!string.IsNullOrWhiteSpace(cargo))
+            {
+                query = query.Where(e => e.Cargo == cargo);
+            }
+
+            var empleados = await query
+                .OrderBy(e => e.Apellido)
+                .ThenBy(e => e.Nombre)
+                .ToListAsync();
+
             return View(empleados);
         }
 
@@ -89,7 +123,7 @@ namespace AppGimn.Controllers
         // ✅ CREATE POST - Procesar formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario")] Empleado empleado)
+        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario,Observaciones")] Empleado empleado)
         {
             if (!await PuedeGestionarEmpleados())
             {
@@ -112,7 +146,7 @@ namespace AppGimn.Controllers
                 _context.Add(empleado);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Empleado creado exitosamente.";
+                TempData["MensajeExito"] = "Empleado creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             return View(empleado);
@@ -138,7 +172,7 @@ namespace AppGimn.Controllers
         // ✅ EDIT POST - Procesar edición
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario")] Empleado empleado)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaIngreso,Cargo,Salario,EstaActivo,Observaciones")] Empleado empleado)
         {
             if (!await PuedeGestionarEmpleados())
             {
@@ -165,7 +199,7 @@ namespace AppGimn.Controllers
                     _context.Update(empleado);
                     await _context.SaveChangesAsync();
 
-                    TempData["Success"] = "Empleado actualizado exitosamente.";
+                    TempData["MensajeExito"] = "Empleado actualizado exitosamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -214,7 +248,7 @@ namespace AppGimn.Controllers
             {
                 _context.Empleados.Remove(empleado);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Empleado eliminado exitosamente.";
+                TempData["MensajeExito"] = "Empleado eliminado exitosamente.";
             }
 
             return RedirectToAction(nameof(Index));

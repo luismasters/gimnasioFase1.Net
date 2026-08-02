@@ -1,261 +1,206 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AppGimn</title>
+    <title>@ViewData["Title"] - AppGimn Premium</title>
+    
+    <!-- Fonts & Bootstrap Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- App Design System -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AppGimn.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-dumbbell"></i> AppGimn
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-saas">
+            <div class="container-fluid px-lg-4">
+                <a class="navbar-brand-saas" asp-controller="Home" asp-action="Index">
+                    <div class="brand-badge-purple">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <span>App<span style="color: var(--primary-light);">Gimn</span> <span class="badge bg-secondary-subtle text-light small fw-normal ms-1 fs-6">PREMIUM</span></span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Inicio
+                            <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" 
+                               asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door me-1"></i> Inicio
                             </a>
                         </li>
 
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Dashboard para empleados y admins -->
-                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "EsEmpleado" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            var userEmail = User.Identity.Name ?? "";
+                            bool isCliente = User.Claims.Any(c => c.Type == "EsCliente" && c.Value == "True") || userEmail.Contains("cliente");
+                            bool isAdmin = User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True") || userEmail.Contains("admin");
+                            bool isRecepcion = userEmail.Contains("recepcion");
+                            bool isInstructor = userEmail.Contains("instructor");
+
+                            @if (isCliente && !isAdmin && !isRecepcion && !isInstructor)
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                                <!-- RUTAS EXCLUSIVAS PARA CLIENTE / SOCIO -->
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "ClientePanel" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="ClientePanel">
+                                        <i class="bi bi-person-badge me-1"></i> Mi Portal Socio
                                     </a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Dashboard" asp-action="Index">
-                                                <i class="fas fa-chart-line"></i> Resumen General
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Dashboard" asp-action="Estadisticas">
-                                                <i class="fas fa-chart-bar"></i> Estadísticas
-                                            </a>
-                                        </li>
-                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "ClienteRutinas" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="ClienteRutinas">
+                                        <i class="bi bi-journal-bookmark me-1"></i> Mis Rutinas
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "ClienteEvolucion" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="ClienteEvolucion">
+                                        <i class="bi bi-graph-up-arrow me-1"></i> Mi Evolución
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "ClienteClases" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="ClienteClases">
+                                        <i class="bi bi-calendar-check me-1"></i> Reservar Clases
+                                    </a>
                                 </li>
                             }
-
-                            <!-- Gestión de Clientes (Gerente/Recepcionista/Admin) -->
-                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "PuedeGestionarClientes" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            else if (isRecepcion && !isAdmin)
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-users"></i> Clientes
+                                <!-- RUTAS EXCLUSIVAS PARA RECEPCIONISTA -->
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "RecepcionPanel" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="RecepcionPanel">
+                                        <i class="bi bi-display me-1"></i> Recepción & Check-in
                                     </a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Index">
-                                                <i class="fas fa-list"></i> Ver Clientes
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Create">
-                                                <i class="fas fa-user-plus"></i> Nuevo Cliente
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Cliente" asp-action="Buscar">
-                                                <i class="fas fa-search"></i> Buscar Cliente
-                                            </a>
-                                        </li>
-                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "RecepcionCobros" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="RecepcionCobros">
+                                        <i class="bi bi-cash-coin me-1"></i> Cobros & Caja
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["controller"]?.ToString() == "Cliente" ? "active" : "")" 
+                                       asp-controller="Cliente" asp-action="Index">
+                                        <i class="bi bi-people me-1"></i> Padrón Clientes
+                                    </a>
                                 </li>
                             }
-
-                            <!-- Gestión de Empleados (Solo Gerente/Admin) -->
-                            @if (User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "PuedeGestionarEmpleados" && c.Value == "True") || User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
+                            else if (isInstructor && !isAdmin)
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-user-tie"></i> Empleados
+                                <!-- RUTAS EXCLUSIVAS PARA INSTRUCTOR -->
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "InstructorPanel" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="InstructorPanel">
+                                        <i class="bi bi-activity me-1"></i> Panel Instructor
                                     </a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Index">
-                                                <i class="fas fa-list"></i> Ver Empleados
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Create">
-                                                <i class="fas fa-user-plus"></i> Nuevo Empleado
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Empleado" asp-action="Reportes">
-                                                <i class="fas fa-file-alt"></i> Reportes
-                                            </a>
-                                        </li>
-                                    </ul>
                                 </li>
                             }
-
-                            <!-- Mi Perfil (Para todos los usuarios logueados) -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user"></i> Mi Perfil
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="fas fa-user-edit"></i> Ver Perfil
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
-                                            <i class="fas fa-key"></i> Cambiar Contraseña
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                            else
+                            {
+                                <!-- RUTAS PARA ADMINISTRADOR DUEÑO (VER TODO) -->
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="Index">
+                                        <i class="bi bi-speedometer2 me-1"></i> Dashboard Admin
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "RecepcionPanel" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="RecepcionPanel">
+                                        <i class="bi bi-display me-1"></i> Recepción
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["action"]?.ToString() == "InstructorPanel" ? "active" : "")" 
+                                       asp-controller="Dashboard" asp-action="InstructorPanel">
+                                        <i class="bi bi-activity me-1"></i> Instructor
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["controller"]?.ToString() == "Cliente" ? "active" : "")" 
+                                       asp-controller="Cliente" asp-action="Index">
+                                        <i class="bi bi-people me-1"></i> Clientes
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-saas @(ViewContext.RouteData.Values["controller"]?.ToString() == "Empleado" ? "active" : "")" 
+                                       asp-controller="Empleado" asp-action="Index">
+                                        <i class="bi bi-person-workspace me-1"></i> Empleados
+                                    </a>
+                                </li>
+                            }
                         }
                     </ul>
 
-                    <!-- Botones de autenticación -->
-                    <ul class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle"></i>
-                                    @User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <h6 class="dropdown-header">
-                                            <i class="fas fa-info-circle"></i> Tu Rol:
-                                            @if (User.Claims.Any(c => c.Type == "EsAdmin" && c.Value == "True"))
-                                            {
-                                                <span class="badge bg-danger">Administrador</span>
-                                            }
-                                            else if (User.Claims.Any(c => c.Type == "EsEmpleado" && c.Value == "True"))
-                                            {
-                                                <span class="badge bg-warning">Empleado</span>
-                                            }
-                                            else if (User.Claims.Any(c => c.Type == "EsCliente" && c.Value == "True"))
-                                            {
-                                                <span class="badge bg-success">Cliente</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">Usuario</span>
-                                            }
-                                        </h6>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                            <button type="submit" class="dropdown-item text-danger">
-                                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Register">
-                                    <i class="fas fa-user-plus"></i> Registrarse
-                                </a>
-                            </li>
-                        }
-                    </ul>
+                    <div class="d-flex align-items-center">
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- Breadcrumb -->
-    @if (ViewData["Breadcrumb"] != null)
-    {
-        <div class="container mt-3">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    @Html.Raw(ViewData["Breadcrumb"])
-                </ol>
-            </nav>
-        </div>
-    }
+    <main role="main">
+        @RenderBody()
+    </main>
 
-    <!-- Mensajes Globales -->
-    <div class="container mt-3">
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle"></i> @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Warning"] != null)
-        {
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle"></i> @TempData["Warning"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Info"] != null)
-        {
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                <i class="fas fa-info-circle"></i> @TempData["Info"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-    </div>
-
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="bg-dark text-light py-4 mt-5">
+    <footer class="footer-saas mt-auto">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-dumbbell"></i> AppGimn</h5>
-                    <p class="mb-0">Sistema de gestión integral para gimnasios</p>
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <a class="navbar-brand-saas mb-3" asp-controller="Home" asp-action="Index">
+                        <div class="brand-badge-purple">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <span>AppGimn</span>
+                    </a>
+                    <p class="text-muted small">
+                        Plataforma SaaS integral para la gestión de gimnasios premium y centros de alto rendimiento.
+                        Control de socios, entrenadores y analíticas en tiempo real.
+                    </p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <small class="text-muted">
-                        &copy; 2025 AppGimn - Todos los derechos reservados
-                    </small>
+
+                <div class="col-6 col-lg-2 ms-lg-auto">
+                    <h6 class="fw-bold text-white mb-3">Navegación</h6>
+                    <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+                        <li><a href="#beneficios" class="text-muted text-decoration-none">Beneficios</a></li>
+                        <li><a href="#servicios" class="text-muted text-decoration-none">Instalaciones</a></li>
+                        <li><a href="#planes" class="text-muted text-decoration-none">Membresías</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <h6 class="fw-bold text-white mb-3">Acceso al Sistema</h6>
+                    <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+                        <li><a asp-controller="Account" asp-action="Login" class="text-muted text-decoration-none">Iniciar Sesión</a></li>
+                        <li><a asp-controller="Home" asp-action="Demo" class="text-muted text-decoration-none">Ver Demo Aura Fitness</a></li>
+                        <li><a asp-controller="Dashboard" asp-action="Index" class="text-muted text-decoration-none">Panel de Control</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="border-secondary opacity-25 my-4">
+
+            <div class="d-md-flex align-items-center justify-content-between text-center text-md-start small text-muted">
+                <div>
+                    &copy; @DateTime.Now.Year AppGimn Premium SaaS. Todos los derechos reservados.
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <span class="me-3"><i class="bi bi-shield-lock-fill text-success me-1"></i> SSL 256-bit Encrypted</span>
+                    <span>.NET 8 Enterprise</span>
                 </div>
             </div>
         </div>

@@ -1,86 +1,101 @@
-﻿@model AppGimn.Models.LoginViewModel
+@model AppGimn.Models.LoginViewModel
 @{
-    ViewData["Title"] = "Iniciar Sesión - Sistema Gimnasio";
+    ViewData["Title"] = "Iniciar Sesión - AppGimn Premium";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h3 class="card-title mb-0 text-center">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                </h3>
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-5">
+        <div class="saas-card p-4 p-md-5">
+            <!-- LOGO Y ENCABEZADO SOBRIO -->
+            <div class="text-center mb-4">
+                <div class="brand-badge-purple mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3 class="fw-bold text-white mb-1">Iniciar Sesión</h3>
+                <p class="text-secondary small">Ingresa tus credenciales para acceder al sistema</p>
             </div>
-            <div class="card-body p-4">
 
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger bg-danger-subtle text-danger border-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <!-- EMAIL -->
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        <i class="bi bi-envelope text-primary me-1"></i> Correo Electrónico
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted">
+                            <i class="bi bi-at"></i>
+                        </span>
+                        <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
                     </div>
-                }
-
-                <form asp-action="Login" method="post">
-                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
-
-                    <!-- Email -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Email" class="form-control" id="floatingEmail" placeholder="nombre@ejemplo.com" />
-                        <label for="floatingEmail" asp-for="Email"></label>
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" class="form-control" id="floatingPassword" placeholder="Password" />
-                        <label for="floatingPassword" asp-for="Password"></label>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <!-- Remember Me -->
-                    <div class="form-check mb-3">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label">
-                            Recordar mis datos
-                        </label>
-                    </div>
-
-                    <!-- Login Button -->
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                        </button>
-                    </div>
-                </form>
-
-                <hr />
-
-                <!-- Links adicionales -->
-                <div class="text-center">
-                    <p class="mb-2">
-                        ¿No tienes cuenta?
-                        <a asp-action="Register" class="text-decoration-none fw-bold">
-                            <i class="fas fa-user-plus"></i> Registrarse
-                        </a>
-                    </p>
-                    <p class="mb-0">
-                        <a href="#" class="text-muted text-decoration-none">
-                            <i class="fas fa-question-circle"></i> ¿Olvidaste tu contraseña?
-                        </a>
-                    </p>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
 
-                <!-- Info para desarrollo -->
-                @if (ViewBag.ShowDemoCredentials == true)
-                {
-                    <hr />
-                    <div class="alert alert-info">
-                        <strong><i class="fas fa-info-circle"></i> Modo Desarrollo:</strong>
-                        <br />
-                        <small>Credenciales de prueba disponibles en el sistema</small>
+                <!-- PASSWORD -->
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">
+                        <i class="bi bi-lock text-primary me-1"></i> Contraseña
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted">
+                            <i class="bi bi-key"></i>
+                        </span>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
                     </div>
-                }
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <!-- RECORDAR MIS DATOS -->
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe" class="form-check-input bg-dark border-secondary" />
+                    <label asp-for="RememberMe" class="form-check-label text-secondary small">
+                        Recordar mis datos en este equipo
+                    </label>
+                </div>
+
+                <!-- BOTÓN INICIAR SESIÓN -->
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-purple btn-lg py-3">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                    </button>
+                </div>
+            </form>
+
+            <hr class="border-secondary opacity-25 my-4" />
+
+            <!-- LINKS SECUNDARIOS -->
+            <div class="text-center small">
+                <p class="text-secondary mb-2">
+                    ¿Aún no tienes cuenta?
+                    <a asp-action="Register" class="text-decoration-none fw-bold" style="color: var(--primary-light);">
+                        <i class="bi bi-person-plus me-1"></i> Registrarse
+                    </a>
+                </p>
+                <p class="mb-0">
+                    <a asp-controller="Home" asp-action="Demo" class="text-muted text-decoration-none">
+                        <i class="bi bi-arrow-left me-1"></i> Volver a la Demo
+                    </a>
+                </p>
+            </div>
+
+            <!-- CREDENCIALES DE PRUEBA RÁPIDAS -->
+            <div class="saas-card p-3 mt-4" style="background-color: var(--bg-surface-variant);">
+                <div class="d-flex align-items-center gap-2 mb-1 text-warning small fw-bold">
+                    <i class="bi bi-info-circle-fill"></i> CREDENCIALES DE DEMOSTRACIÓN (ADMIN):
+                </div>
+                <div class="small text-secondary">
+                    <div><strong>Email:</strong> <code class="text-light">admin@gimnasio.com</code></div>
+                    <div><strong>Contraseña:</strong> <code class="text-light">Admin123!</code></div>
+                </div>
             </div>
         </div>
     </div>

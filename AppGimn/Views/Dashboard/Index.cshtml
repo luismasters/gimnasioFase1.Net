@@ -1,0 +1,150 @@
+@model AppGimn.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard de Control - AppGimn Premium";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-white mb-1">
+                <i class="bi bi-speedometer2 text-primary me-2"></i>Panel de Control Operativo
+            </h2>
+            <p class="text-secondary small mb-0">Resumen en tiempo real de socios, plantilla de personal e indicadores del gimnasio</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Estadisticas" class="btn btn-outline-purple">
+                <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
+            </a>
+            <a asp-controller="Cliente" asp-action="Create" class="btn btn-purple">
+                <i class="bi bi-person-plus me-1"></i> Nuevo Cliente
+            </a>
+        </div>
+    </div>
+
+    <!-- METRIC STAT CARDS -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-sm-6">
+            <div class="saas-card p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small fw-bold text-uppercase">Total Clientes</span>
+                    <div class="brand-badge-purple" style="width: 40px; height: 40px;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-bold text-white mb-1">@Model.TotalClientes</h2>
+                <span class="saas-badge saas-badge-success">
+                    <i class="bi bi-check-circle-fill"></i> Alumnos Activos
+                </span>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="saas-card p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small fw-bold text-uppercase">Total Empleados</span>
+                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-info);">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-bold text-white mb-1">@Model.TotalEmpleados</h2>
+                <span class="saas-badge saas-badge-purple">
+                    Plantilla Activa
+                </span>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="saas-card p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small fw-bold text-uppercase">Altas Recientes</span>
+                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-success);">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-bold text-white mb-1">@Model.ClientesRecientes</h2>
+                <span class="text-muted small">Últimos 7 días</span>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="saas-card p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted small fw-bold text-uppercase">Clientes Inactivos</span>
+                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-warning);">
+                        <i class="bi bi-person-x-fill"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-bold text-white mb-1">@Model.ClientesInactivos</h2>
+                <span class="saas-badge saas-badge-danger">Bajas temporales</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCESOS RÁPIDOS Y RESUMEN DE EMPLEADOS POR CARGO -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="saas-card p-4 h-100">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-diagram-3 text-primary me-2"></i>Distribución de Personal por Cargo
+                </h5>
+
+                @if (Model.EmpleadosPorCargo != null && Model.EmpleadosPorCargo.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var cargo in Model.EmpleadosPorCargo)
+                        {
+                            <div>
+                                <div class="d-flex justify-content-between text-secondary small fw-semibold mb-1">
+                                    <span>@cargo.Cargo</span>
+                                    <span class="text-white">@cargo.Cantidad empleado(s)</span>
+                                </div>
+                                <div class="progress bg-dark" style="height: 8px;">
+                                    <div class="progress-bar" style="width: @(cargo.Cantidad * 33)%; background-color: var(--primary);"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted small">No hay empleados registrados en plantilla.</p>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="saas-card p-4 h-100">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-lightning-charge text-warning me-2"></i>Acciones Rápidas
+                </h5>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <a asp-controller="Cliente" asp-action="Index" class="saas-card p-3 d-block text-decoration-none text-white text-center">
+                            <i class="bi bi-people fs-2 text-primary d-block mb-1"></i>
+                            <span class="small fw-semibold">Ver Clientes</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-controller="Empleado" asp-action="Index" class="saas-card p-3 d-block text-decoration-none text-white text-center">
+                            <i class="bi bi-person-badge fs-2 text-info d-block mb-1"></i>
+                            <span class="small fw-semibold">Ver Empleados</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-controller="Cliente" asp-action="Create" class="saas-card p-3 d-block text-decoration-none text-white text-center">
+                            <i class="bi bi-person-plus fs-2 text-success d-block mb-1"></i>
+                            <span class="small fw-semibold">Nuevo Cliente</span>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-action="Estadisticas" class="saas-card p-3 d-block text-decoration-none text-white text-center">
+                            <i class="bi bi-bar-chart fs-2 text-warning d-block mb-1"></i>
+                            <span class="small fw-semibold">Estadísticas</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

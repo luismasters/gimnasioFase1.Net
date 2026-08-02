@@ -1,88 +1,107 @@
-﻿@model AppGimn.Models.Cliente
+@model AppGimn.Models.Cliente
 
 @{
-    ViewData["Title"] = "Nuevo Cliente";
+    ViewData["Title"] = "Registrar Nuevo Cliente - AppGimn";
 }
 
-<h2>🏋️‍♂️ Registrar Nuevo Cliente</h2>
-<hr />
-
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Apellido" class="control-label"></label>
-                <input asp-for="Apellido" class="form-control" />
-                <span asp-validation-for="Apellido" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="DNI" class="control-label"></label>
-                <input asp-for="DNI" class="form-control" />
-                <span asp-validation-for="DNI" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="FechaNacimiento" class="control-label"></label>
-                <input asp-for="FechaNacimiento" class="form-control" type="date" />
-                <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="FechaInscripcion" class="control-label"></label>
-                <input asp-for="FechaInscripcion" class="form-control" type="date" />
-                <span asp-validation-for="FechaInscripcion" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="ContactoEmergencia" class="control-label"></label>
-                <input asp-for="ContactoEmergencia" class="form-control" />
-                <span asp-validation-for="ContactoEmergencia" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="ObservacionesMedicas" class="control-label"></label>
-                <textarea asp-for="ObservacionesMedicas" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="ObservacionesMedicas" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <div class="form-check">
-                    <input asp-for="EstaActivo" class="form-check-input" />
-                    <label asp-for="EstaActivo" class="form-check-label"></label>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="saas-card p-4 p-md-5">
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
+                <div>
+                    <h3 class="fw-bold text-white mb-1">
+                        <i class="bi bi-person-plus-fill text-primary me-2"></i>Registrar Nuevo Cliente
+                    </h3>
+                    <p class="text-secondary small mb-0">Ingresa los datos personales, ficha médica y contacto de emergencia</p>
                 </div>
+                <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Volver al Listado
+                </a>
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="Crear Cliente" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
-            </div>
-        </form>
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Carlos" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Apellido" class="form-label"></label>
+                        <input asp-for="Apellido" class="form-control" placeholder="Ej. Gómez" />
+                        <span asp-validation-for="Apellido" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="DNI" class="form-label"></label>
+                        <input asp-for="DNI" class="form-control" placeholder="12345678" />
+                        <span asp-validation-for="DNI" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FechaNacimiento" class="form-label"></label>
+                        <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="+54 11 4455-6677" />
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="carlos.gomez@gmail.com" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FechaInscripcion" class="form-label"></label>
+                        <input asp-for="FechaInscripcion" class="form-control" type="date" />
+                        <span asp-validation-for="FechaInscripcion" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ContactoEmergencia" class="form-label"></label>
+                        <input asp-for="ContactoEmergencia" class="form-control" placeholder="Nombre y teléfono de contacto" />
+                        <span asp-validation-for="ContactoEmergencia" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ObservacionesMedicas" class="form-label"></label>
+                    <textarea asp-for="ObservacionesMedicas" class="form-control" rows="3" placeholder="Apto médico, lesiones previas, alergias u observaciones de salud..."></textarea>
+                    <span asp-validation-for="ObservacionesMedicas" class="text-danger small"></span>
+                </div>
+
+                <div class="saas-card p-3 mb-4" style="background-color: var(--bg-surface-variant);">
+                    <div class="form-check">
+                        <input asp-for="EstaActivo" class="form-check-input bg-dark border-secondary" checked />
+                        <label asp-for="EstaActivo" class="form-check-label text-white small">
+                            Cliente Activo (Permite acceso y reservas en el gimnasio)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-purple btn-lg px-4">
+                        <i class="bi bi-check-circle-fill me-1"></i> Guardar Cliente
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary-saas btn-lg px-4">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

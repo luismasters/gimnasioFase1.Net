@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+ï»¿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AppGimn.Data;
 using AppGimn.Models;
@@ -15,10 +15,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Configuración de Identity
+// Configuraciï¿½n de Identity
 builder.Services.AddDefaultIdentity<Usuario>(options =>
 {
-    // Configuración de contraseñas
+    // Configuraciï¿½n de contraseï¿½as
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireNonAlphanumeric = false;
@@ -26,12 +26,12 @@ builder.Services.AddDefaultIdentity<Usuario>(options =>
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
 
-    // Configuración de bloqueo de cuenta
+    // Configuraciï¿½n de bloqueo de cuenta
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
-    // Configuración de usuario
+    // Configuraciï¿½n de usuario
     options.User.AllowedUserNameCharacters =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
@@ -80,4 +80,5 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+await AppGimn.Data.DbSeeder.SeedAsync(app.Services);
 app.Run();

@@ -1,103 +1,126 @@
-﻿@model IEnumerable<AppGimn.Models.Cliente>
+@model IEnumerable<AppGimn.Models.Cliente>
 
 @{
-    ViewData["Title"] = "Clientes";
+    ViewData["Title"] = "Gestión de Clientes - AppGimn Premium";
 }
 
-<h2>👥 Listado de Clientes</h2>
-
-<p>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="fa fa-plus"></i> Nuevo Cliente
-    </a>
-</p>
-
-<!-- Búsqueda -->
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color mb-3">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" name="buscar" value="@ViewData["FiltroActual"]"
-                       class="form-control" placeholder="Buscar por nombre, apellido o DNI..." />
-            </div>
-            <div class="col-md-2">
-                <input type="submit" value="Buscar" class="btn btn-outline-primary" />
-            </div>
-            <div class="col-md-2">
-                <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
-            </div>
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-white mb-1">
+                <i class="bi bi-people text-primary me-2"></i>Gestión de Clientes
+            </h2>
+            <p class="text-secondary small mb-0">Administra y consulta la información del alumnado del gimnasio</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-purple">
+                <i class="bi bi-person-plus me-1"></i> Registrar Nuevo Cliente
+            </a>
         </div>
     </div>
-</form>
 
-@if (TempData["MensajeExito"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>¡Éxito!</strong> @TempData["MensajeExito"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success bg-dark border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <strong>¡Éxito!</strong> @TempData["MensajeExito"]
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- FILTER & SEARCH CARD -->
+    <div class="saas-card p-4 mb-4">
+        <form asp-action="Index" method="get">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="buscar" value="@ViewData["FiltroActual"]"
+                               class="form-control" placeholder="Buscar por nombre, apellido, DNI o email..." />
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-purple flex-grow-1">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary-saas">
+                        <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
-}
 
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Nombre Completo</th>
-                <th>DNI</th>
-                <th>Edad</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var cliente in Model)
-            {
-                <tr class="@(cliente.EstaActivo ? "" : "table-secondary")">
-                    <td>@cliente.NombreCompleto</td>
-                    <td>@cliente.DNI</td>
-                    <td>@cliente.Edad años</td>
-                    <td>@(cliente.Telefono ?? "N/A")</td>
-                    <td>@(cliente.Email ?? "N/A")</td>
-                    <td>
-                        @if (cliente.EstaActivo)
-                        {
-                            <span class="badge bg-success">Activo</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">Inactivo</span>
-                        }
-                    </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@cliente.Id"
-                           class="btn btn-info btn-sm">Ver</a>
-                        <a asp-action="Edit" asp-route-id="@cliente.Id"
-                           class="btn btn-warning btn-sm">Editar</a>
-
-                        @if (cliente.EstaActivo)
-                        {
-                            <a asp-action="Delete" asp-route-id="@cliente.Id"
-                               class="btn btn-danger btn-sm">Eliminar</a>
-                        }
-                        else
-                        {
-                            <form asp-action="Reactivar" asp-route-id="@cliente.Id" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-success btn-sm">Reactivar</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- CLIENTS TABLE CARD -->
+    <div class="saas-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-saas mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>DNI</th>
+                        <th>Edad</th>
+                        <th>Teléfono</th>
+                        <th>Email</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold text-white">
+                                <i class="bi bi-person-circle me-2 text-muted"></i>@item.NombreCompleto
+                            </td>
+                            <td><code class="text-light">@item.DNI</code></td>
+                            <td>@item.Edad años</td>
+                            <td>@(item.Telefono ?? "-")</td>
+                            <td><span class="text-muted">@(item.Email ?? "-")</span></td>
+                            <td>
+                                @if (item.EstaActivo)
+                                {
+                                    <span class="saas-badge saas-badge-success">
+                                        <i class="bi bi-check-circle-fill"></i> Activo
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="saas-badge saas-badge-danger">
+                                        <i class="bi bi-x-circle-fill"></i> Inactivo
+                                    </span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Ver Detalle">
+                                        <i class="bi bi-eye text-info"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Editar">
+                                        <i class="bi bi-pencil text-warning"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Eliminar/Desactivar">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fa-3x mb-3 d-block opacity-50"></i>
+                            No se encontraron clientes registrados o coincidentes con la búsqueda.
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        <h4>No hay clientes registrados</h4>
-        <p>¡Crea el primer cliente haciendo clic en "Nuevo Cliente"!</p>
-    </div>
-}

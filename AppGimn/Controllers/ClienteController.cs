@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +42,8 @@ namespace AppGimn.Controllers
                    empleado.Cargo.Equals("Recepcionista", StringComparison.OrdinalIgnoreCase);
         }
 
-        // ✅ INDEX - Lista de clientes
-        public async Task<IActionResult> Index()
+        // ✅ INDEX - Lista de clientes con búsqueda por término
+        public async Task<IActionResult> Index(string? buscar)
         {
             // Verificar permisos
             if (!await PuedeGestionarClientes())
@@ -52,7 +52,25 @@ namespace AppGimn.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var clientes = await _context.Clientes.ToListAsync();
+            ViewData["FiltroActual"] = buscar;
+
+            IQueryable<Cliente> query = _context.Clientes;
+
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                var termino = buscar.Trim().ToLower();
+                query = query.Where(c =>
+                    c.Nombre.ToLower().Contains(termino) ||
+                    c.Apellido.ToLower().Contains(termino) ||
+                    c.DNI.Contains(termino) ||
+                    (c.Email != null && c.Email.ToLower().Contains(termino)));
+            }
+
+            var clientes = await query
+                .OrderBy(c => c.Apellido)
+                .ThenBy(c => c.Nombre)
+                .ToListAsync();
+
             return View(clientes);
         }
 
@@ -90,7 +108,7 @@ namespace AppGimn.Controllers
         // ✅ CREATE POST - Procesar formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,TipoMembresia")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo")] Cliente cliente)
         {
             if (!await PuedeGestionarClientes())
             {
@@ -113,7 +131,7 @@ namespace AppGimn.Controllers
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = "Cliente creado exitosamente.";
+                TempData["MensajeExito"] = "Cliente creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             return View(cliente);
@@ -166,7 +184,7 @@ namespace AppGimn.Controllers
                     _context.Update(cliente);
                     await _context.SaveChangesAsync();
 
-                    TempData["Success"] = "Cliente actualizado exitosamente.";
+                    TempData["MensajeExito"] = "Cliente actualizado exitosamente.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -215,7 +233,7 @@ namespace AppGimn.Controllers
             {
                 _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Cliente eliminado exitosamente.";
+                TempData["MensajeExito"] = "Cliente eliminado exitosamente.";
             }
 
             return RedirectToAction(nameof(Index));

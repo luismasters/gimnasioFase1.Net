@@ -1,0 +1,158 @@
+@{
+    ViewData["Title"] = "Aura Fitness Club - Selector de Experiencias Demo";
+}
+
+<!-- BANNER SUPERIOR INFORMATIVO -->
+<div class="bg-primary text-white py-2 px-3 text-center small fw-semibold">
+    <i class="bi bi-rocket-takeoff-fill me-1"></i> PORTAL DE DEMOSTRACIÓN INTERACTIVA: <strong>AURA FITNESS CLUB</strong>. 
+    EXPLORA EL SISTEMA DESDE CUALQUIERA DE LOS 4 ROLES EMPRESARIALES CON 1 SOLO CLIC.
+</div>
+
+<!-- HERO DE PRESENTACIÓN CON SELECTOR DE EXPERIENCIA DEMO -->
+<section class="py-5" style="background: radial-gradient(circle at 50% 30%, rgba(139, 61, 255, 0.2) 0%, rgba(18, 18, 18, 0) 70%);">
+    <div class="container">
+        <div class="text-center mb-5 max-w-800 mx-auto">
+            <span class="saas-badge saas-badge-purple mb-3 fs-6">
+                <i class="bi bi-layers-half text-warning me-1"></i> EXPERIENCIAS PERSONALIZADAS SEGÚN EL ROL
+            </span>
+            <h1 class="display-3 fw-bold text-white mb-3 text-uppercase" style="letter-spacing: -1.5px;">
+                AURA FITNESS CLUB
+            </h1>
+            <p class="text-secondary fs-4 mb-0">
+                ¿Qué experiencia deseas explorar hoy? Cada rol adapta la navegación, las prioridades y el tono visual de la aplicación.
+            </p>
+        </div>
+
+        <!-- TARJETAS GRANDES DE SELECTOR DE ROL DE DEMO EN 1-CLICK -->
+        <div class="row g-4 mb-5">
+            <!-- 1. RUTA CLIENTE -->
+            <div class="col-lg-3 col-md-6">
+                <div class="saas-card p-4 text-center h-100 d-flex flex-column justify-content-between border-primary" style="background: linear-gradient(180deg, rgba(30, 30, 30, 1) 0%, rgba(43, 43, 43, 0.8) 100%);">
+                    <div>
+                        <div class="brand-badge-purple mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.75rem;">
+                            👤
+                        </div>
+                        <h4 class="fw-bold text-white mb-2">Cliente / Alumno</h4>
+                        <span class="badge bg-primary-subtle text-light mb-3">Visual & Motivador</span>
+                        <p class="text-secondary small mb-4">
+                            "Mi gimnasio personal": Rutina asignada, evolución física en gráficos, reserva de clases y estado de cuota.
+                        </p>
+                    </div>
+                    <a asp-controller="Account" asp-action="QuickLogin" asp-route-role="cliente" class="btn btn-purple w-100 py-3 fw-bold">
+                        <i class="bi bi-play-circle-fill me-1"></i> Explorar como Cliente
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. RUTA RECEPCIONISTA -->
+            <div class="col-lg-3 col-md-6">
+                <div class="saas-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(180deg, rgba(30, 30, 30, 1) 0%, rgba(43, 43, 43, 0.8) 100%);">
+                    <div>
+                        <div class="brand-badge-purple mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.75rem; background-color: var(--color-info);">
+                            🖥️
+                        </div>
+                        <h4 class="fw-bold text-white mb-2">Recepcionista</h4>
+                        <span class="badge bg-info-subtle text-info mb-3">Operacional & Rápido</span>
+                        <p class="text-secondary small mb-4">
+                            "Estoy trabajando": Terminal de check-in exprés por DNI, cobro rápido de mensualidad y socios presentes.
+                        </p>
+                    </div>
+                    <a asp-controller="Account" asp-action="QuickLogin" asp-route-role="recepcion" class="btn btn-secondary-saas w-100 py-3 fw-bold">
+                        <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Entorno Recepción
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. RUTA INSTRUCTOR -->
+            <div class="col-lg-3 col-md-6">
+                <div class="saas-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="background: linear-gradient(180deg, rgba(30, 30, 30, 1) 0%, rgba(43, 43, 43, 0.8) 100%);">
+                    <div>
+                        <div class="brand-badge-purple mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.75rem; background-color: var(--color-success);">
+                            💪
+                        </div>
+                        <h4 class="fw-bold text-white mb-2">Instructor</h4>
+                        <span class="badge bg-success-subtle text-success mb-3">Enfocado en Personas</span>
+                        <p class="text-secondary small mb-4">
+                            "Mi equipo de alumnos": Armado de rutinas, evaluaciones de progreso y agenda diaria de entrenamiento.
+                        </p>
+                    </div>
+                    <a asp-controller="Account" asp-action="QuickLogin" asp-route-role="instructor" class="btn btn-secondary-saas w-100 py-3 fw-bold">
+                        <i class="bi bi-people-fill me-1"></i> Entorno Instructor
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. RUTA ADMINISTRADOR -->
+            <div class="col-lg-3 col-md-6">
+                <div class="saas-card p-4 text-center h-100 d-flex flex-column justify-content-between saas-card-featured">
+                    <div>
+                        <div class="brand-badge-purple mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.75rem; background-color: #8B3DFF;">
+                            👑
+                        </div>
+                        <h4 class="fw-bold text-white mb-2">Administrador</h4>
+                        <span class="badge bg-purple-subtle text-light mb-3">Dashboard Ejecutivo</span>
+                        <p class="text-secondary small mb-4">
+                            "Control total": Indicadores financieros, altas/bajas, nómina de empleados y configuración global.
+                        </p>
+                    </div>
+                    <a asp-controller="Account" asp-action="QuickLogin" asp-route-role="admin" class="btn btn-purple w-100 py-3 fw-bold">
+                        <i class="bi bi-speedometer2 me-1"></i> Entorno Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECCIÓN DE INSTALACIONES FOTOGRÁFICAS MÁS GRANDES -->
+<section class="py-5" style="background-color: var(--bg-surface);">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <span class="saas-badge saas-badge-purple mb-2">INSTALACIONES AURA FITNESS</span>
+            <h3 class="fw-bold text-white display-6">Instalaciones de Alto Rendimiento</h3>
+            <p class="text-secondary">Fotos reales de los espacios donde entrenan nuestros socios</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="saas-card overflow-hidden h-100">
+                    <img src="~/images/landing/aura_hero.jpg" alt="Aura Fitness Main Floor" class="img-16-9" style="height: 320px; object-fit: cover;" />
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-2">Planta Principal & Musculación</h4>
+                        <p class="text-secondary small mb-0">Racks de competición, mancuernas de uretano y biomecánica avanzada.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="saas-card overflow-hidden h-100">
+                    <img src="~/images/landing/aura_strength.jpg" alt="Aura Strength Zone" class="img-16-9" style="height: 320px; object-fit: cover;" />
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-2">Zona de Fuerza Pesada</h4>
+                        <p class="text-secondary small mb-0">Equipamiento iso-lateral Hammer Strength para deportistas exigentes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="saas-card overflow-hidden h-100">
+                    <img src="~/images/landing/aura_spa.jpg" alt="Aura Spa Lounge" class="img-16-9" style="height: 280px; object-fit: cover;" />
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-2">Spa & Muscle Recovery Lounge</h4>
+                        <p class="text-secondary small mb-0">Saunas finlandesas, piletas heladas y crioterapia para recuperación física.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="saas-card overflow-hidden h-100">
+                    <img src="~/images/landing/group_classes.jpg" alt="Estudio de Clases" class="img-16-9" style="height: 280px; object-fit: cover;" />
+                    <div class="p-4">
+                        <h4 class="fw-bold text-white mb-2">Estudios de Pilates & Crossfit</h4>
+                        <p class="text-secondary small mb-0">Salones acondicionados con monitoreo de rendimiento e instructores de élite.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,28 +1,44 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<Usuario> SignInManager
 @inject UserManager<Usuario> UserManager
 
-<ul class="navbar-nav"> 
+<ul class="navbar-nav align-items-center gap-2">
 @if (SignInManager.IsSignedIn(User))
 {
-        var usuario = await UserManager.GetUserAsync(User);
-
-    <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @usuario.Email</a>
-        </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
+    var usuario = await UserManager.GetUserAsync(User);
+    var email = usuario?.Email ?? User.Identity?.Name ?? "Usuario";
+    
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle btn btn-secondary-saas text-white btn-sm px-3 py-1 d-flex align-items-center gap-2" 
+           href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle text-primary"></i>
+            <span class="small fw-semibold text-white">@email</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border mt-2 bg-dark" aria-labelledby="userDropdown" style="border-color: var(--border-color) !important;">
+            <li class="dropdown-header text-muted small">CONECTADO COMO</li>
+            <li><span class="dropdown-item-text text-white fw-bold">@email</span></li>
+            <li><hr class="dropdown-divider border-secondary"></li>
+            <li>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                    <button type="submit" class="dropdown-item text-danger fw-semibold d-flex align-items-center gap-2">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                    </button>
+                </form>
+            </li>
+        </ul>
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        <a class="btn btn-secondary-saas btn-sm" asp-controller="Account" asp-action="Login">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+        </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        <a class="btn btn-purple btn-sm" asp-controller="Home" asp-action="Demo">
+            <i class="bi bi-play-circle-fill me-1"></i> VER DEMO EN VIVO
+        </a>
     </li>
 }
 </ul>

@@ -1,0 +1,99 @@
+@model AppGimn.Models.EstadisticasViewModel
+
+@{
+    ViewData["Title"] = "Estadísticas - AppGimn Pro";
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">
+            <i class="bi bi-bar-chart-line text-primary me-2"></i>Estadísticas y Analítica
+        </h2>
+        <p class="text-secondary small mb-0">Evolución histórica de inscripciones y antigüedad de la plantilla</p>
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-outline-slate btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- CLIENTES POR MES -->
+    <div class="col-lg-6">
+        <div class="card-minimal overflow-hidden h-100">
+            <div class="p-4 border-bottom">
+                <h5 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-calendar-range text-primary me-2"></i>Inscripciones por Mes
+                </h5>
+            </div>
+
+            @if (Model.ClientesPorMes != null && Model.ClientesPorMes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-minimal mb-0">
+                        <thead>
+                            <tr>
+                                <th>Mes / Año</th>
+                                <th class="text-end">Nuevas Inscripciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mes in Model.ClientesPorMes)
+                            {
+                                <tr>
+                                    <td class="fw-semibold text-dark">@mes.NombreMes</td>
+                                    <td class="text-end fw-bold text-primary">@mes.Cantidad cliente(s)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-muted small">No hay suficientes registros históricos en los últimos meses.</div>
+            }
+        </div>
+    </div>
+
+    <!-- EMPLEADOS POR ANTIGÜEDAD -->
+    <div class="col-lg-6">
+        <div class="card-minimal overflow-hidden h-100">
+            <div class="p-4 border-bottom">
+                <h5 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-award text-warning me-2"></i>Antigüedad del Personal
+                </h5>
+            </div>
+
+            @if (Model.EmpleadosPorAntiguedad != null && Model.EmpleadosPorAntiguedad.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-minimal mb-0">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Cargo</th>
+                                <th class="text-end">Antigüedad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var emp in Model.EmpleadosPorAntiguedad)
+                            {
+                                <tr>
+                                    <td class="fw-semibold text-dark">@emp.NombreCompleto</td>
+                                    <td><span class="badge bg-light text-dark border">@emp.Cargo</span></td>
+                                    <td class="text-end fw-bold text-success">@emp.AntiguedadAños años (@emp.AntiguedadDias días)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-muted small">No hay empleados registrados en plantilla.</div>
+            }
+        </div>
+    </div>
+</div>

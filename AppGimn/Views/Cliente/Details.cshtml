@@ -1,177 +1,78 @@
-﻿@model AppGimn.Models.Cliente
+@model AppGimn.Models.Cliente
 
 @{
-    ViewData["Title"] = $"Detalles de {Model.NombreCompleto}";
+    ViewData["Title"] = "Detalle del Cliente - AppGimn";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-user"></i> Detalles del Cliente
-                    </h3>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="saas-card p-4 p-md-5">
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
+                <div>
+                    <span class="saas-badge @(Model.EstaActivo ? "saas-badge-success" : "saas-badge-danger") mb-2">
+                        @(Model.EstaActivo ? "Cliente Activo" : "Cliente Inactivo")
+                    </span>
+                    <h3 class="fw-bold text-white mb-0">@Model.NombreCompleto</h3>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Información Personal -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-id-card"></i> Información Personal
-                            </h5>
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-purple btn-sm">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
+            </div>
 
-                            <dl class="row">
-                                <dt class="col-sm-5">Nombre Completo:</dt>
-                                <dd class="col-sm-7">@Model.NombreCompleto</dd>
-
-                                <dt class="col-sm-5">DNI:</dt>
-                                <dd class="col-sm-7">@Model.DNI</dd>
-
-                                <dt class="col-sm-5">Fecha Nacimiento:</dt>
-                                <dd class="col-sm-7">@Model.FechaNacimiento.ToString("dd/MM/yyyy")</dd>
-
-                                <dt class="col-sm-5">Edad:</dt>
-                                <dd class="col-sm-7">
-                                    @Model.Edad años
-                                    @if (Model.EsMayorDeEdad)
-                                    {
-                                        <span class="badge badge-success">Mayor de edad</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-warning">Menor de edad</span>
-                                    }
-                                </dd>
-                            </dl>
-                        </div>
-
-                        <!-- Contacto -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-phone"></i> Contacto
-                            </h5>
-
-                            <dl class="row">
-                                <dt class="col-sm-5">Teléfono:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.Telefono))
-                                    {
-                                        <a href="tel:@Model.Telefono" class="text-decoration-none">
-                                            <i class="fas fa-phone text-success"></i> @Model.Telefono
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No especificado</span>
-                                    }
-                                </dd>
-
-                                <dt class="col-sm-5">Email:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.Email))
-                                    {
-                                        <a href="mailto:@Model.Email" class="text-decoration-none">
-                                            <i class="fas fa-envelope text-primary"></i> @Model.Email
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No especificado</span>
-                                    }
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="row">
-                        <!-- Información del Gimnasio -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-dumbbell"></i> Información del Gimnasio
-                            </h5>
-
-                            <dl class="row">
-                                <dt class="col-sm-5">Fecha Inscripción:</dt>
-                                <dd class="col-sm-7">@Model.FechaInscripcion.ToString("dd/MM/yyyy")</dd>
-
-                                <dt class="col-sm-5">Días como miembro:</dt>
-                                <dd class="col-sm-7">@((DateTime.Now - Model.FechaInscripcion).Days) días</dd>
-
-                                <dt class="col-sm-5">Estado:</dt>
-                                <dd class="col-sm-7">
-                                    @if (Model.EstaActivo)
-                                    {
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-check"></i> Activo
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-danger">
-                                            <i class="fas fa-times"></i> Inactivo
-                                        </span>
-                                    }
-                                </dd>
-                            </dl>
-                        </div>
-
-                        <!-- Información Adicional -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-info-circle"></i> Información Adicional
-                            </h5>
-
-                            <dl class="row">
-                                <dt class="col-sm-5">Contacto Emergencia:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.ContactoEmergencia))
-                                    {
-                                        @Model.ContactoEmergencia
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No especificado</span>
-                                    }
-                                </dd>
-
-                                <dt class="col-sm-5">Observaciones Médicas:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.ObservacionesMedicas))
-                                    {
-                                        <div class="alert alert-warning small" role="alert">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                            @Model.ObservacionesMedicas
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Ninguna</span>
-                                    }
-                                </dd>
-                            </dl>
-                        </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">DNI</span>
+                        <div class="fs-5 text-white fw-bold"><code>@Model.DNI</code></div>
                     </div>
                 </div>
 
-                <!-- Botones de acción -->
-                <div class="card-footer">
-                    <div class="btn-group" role="group">
-                        <a asp-action="Edit" asp-route-id="@Model.Id"
-                           class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Edad</span>
+                        <div class="fs-5 text-white fw-bold">@Model.Edad años <span class="text-muted fs-6 font-normal">(Nacido/a el @Model.FechaNacimiento.ToString("dd/MM/yyyy"))</span></div>
+                    </div>
+                </div>
 
-                        <a asp-action="Delete" asp-route-id="@Model.Id"
-                           class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </a>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Teléfono</span>
+                        <div class="fs-6 text-white"><i class="bi bi-telephone text-primary me-2"></i>@(Model.Telefono ?? "No registrado")</div>
+                    </div>
+                </div>
 
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver al listado
-                        </a>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Email</span>
+                        <div class="fs-6 text-white"><i class="bi bi-envelope text-primary me-2"></i>@(Model.Email ?? "No registrado")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Fecha de Inscripción</span>
+                        <div class="fs-6 text-white"><i class="bi bi-calendar-check text-success me-2"></i>@Model.FechaInscripcion.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Contacto de Emergencia</span>
+                        <div class="fs-6 text-white"><i class="bi bi-shield-exclamation text-warning me-2"></i>@(Model.ContactoEmergencia ?? "No registrado")</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Observaciones Médicas / Ficha Médica</span>
+                        <p class="text-white mb-0 small">
+                            @(string.IsNullOrWhiteSpace(Model.ObservacionesMedicas) ? "Sin observaciones médicas registradas." : Model.ObservacionesMedicas)
+                        </p>
                     </div>
                 </div>
             </div>

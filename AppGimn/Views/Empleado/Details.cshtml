@@ -1,318 +1,81 @@
-﻿@model AppGimn.Models.Empleado
+@model AppGimn.Models.Empleado
 
 @{
-    ViewData["Title"] = $"Detalles de {Model.NombreCompleto}";
+    ViewData["Title"] = "Detalle de Empleado - AppGimn";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-10 mx-auto">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h3 class="card-title mb-0">
-                                <i class="fas fa-user"></i> Detalles del Empleado
-                            </h3>
-                            <small class="text-light">ID: @Model.Id - @Model.Cargo</small>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            @if (Model.EstaActivo)
-                            {
-                                <span class="badge badge-success fs-6">
-                                    <i class="fas fa-check"></i> Empleado Activo
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-secondary fs-6">
-                                    <i class="fas fa-times"></i> Empleado Inactivo
-                                </span>
-                            }
-                        </div>
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8">
+        <div class="saas-card p-4 p-md-5">
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2">
+                        Cargo: @Model.Cargo
+                    </span>
+                    <h3 class="fw-bold text-white mb-0">@Model.NombreCompleto</h3>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-purple btn-sm">
+                        <i class="bi bi-pencil me-1"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">DNI</span>
+                        <div class="fs-5 text-white fw-bold"><code>@Model.DNI</code></div>
                     </div>
                 </div>
 
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Información Personal -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-id-card"></i> Información Personal
-                            </h5>
-
-                            <dl class="row">
-                                <dt class="col-sm-5">Nombre Completo:</dt>
-                                <dd class="col-sm-7"><strong>@Model.NombreCompleto</strong></dd>
-
-                                <dt class="col-sm-5">DNI:</dt>
-                                <dd class="col-sm-7">@Model.DNI</dd>
-
-                                <dt class="col-sm-5">Teléfono:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.Telefono))
-                                    {
-                                        <a href="tel:@Model.Telefono" class="text-decoration-none">
-                                            <i class="fas fa-phone text-success"></i> @Model.Telefono
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No especificado</span>
-                                    }
-                                </dd>
-
-                                <dt class="col-sm-5">Email:</dt>
-                                <dd class="col-sm-7">
-                                    @if (!string.IsNullOrEmpty(Model.Email))
-                                    {
-                                        <a href="mailto:@Model.Email" class="text-decoration-none">
-                                            <i class="fas fa-envelope text-primary"></i> @Model.Email
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No especificado</span>
-                                    }
-                                </dd>
-                            </dl>
-                        </div>
-
-                        <!-- Información Laboral -->
-                        <div class="col-md-6">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-building"></i> Información Laboral
-                            </h5>
-
-                            <dl class="row">
-                                <dt class="col-sm-5">Cargo:</dt>
-                                <dd class="col-sm-7">
-                                    <span class="badge badge-@GetCargoColor(Model.Cargo) fs-6">
-                                        @Model.Cargo
-                                    </span>
-                                    @if (Model.PuedeGestionarEmpleados)
-                                    {
-                                        <br>
-                                    
-                                        <small class="text-warning mt-1">
-                                            <i class="fas fa-crown"></i> Permisos de administrador
-                                        </small>
-                                    }
-                                </dd>
-
-                                <dt class="col-sm-5">Salario:</dt>
-                                <dd class="col-sm-7">
-                                    <strong class="text-success">$@Model.Salario.ToString()</strong>
-                                    <small class="text-muted">mensuales</small>
-                                </dd>
-
-                                <dt class="col-sm-5">Fecha Contratación:</dt>
-                                <dd class="col-sm-7">@Model.FechaIngreso.ToString("dd/MM/yyyy")</dd>
-
-                                <dt class="col-sm-5">Antigüedad:</dt>
-                                <dd class="col-sm-7">
-                                    @Model.AntiguedadDias días
-                                    <small class="text-muted">
-                                        (@Math.Round(Model.AntiguedadDias / 365.0, 1) año(s))
-                                    </small>
-                                </dd>
-                            </dl>
-                        </div>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Salario</span>
+                        <div class="fs-5 text-success fw-bold">@(Model.Salario.HasValue ? Model.Salario.Value.ToString("C") : "No especificado")</div>
                     </div>
-
-                    <hr>
-
-                    <!-- Permisos del Sistema -->
-                    <div class="row">
-                        <div class="col-12">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-key"></i> Permisos del Sistema
-                            </h5>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="card border-@(Model.PuedeGestionarClientes ? "success" : "secondary")">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-users fa-2x @(Model.PuedeGestionarClientes ? "text-success" : "text-muted") mb-2"></i>
-                                            <h6>Gestión de Clientes</h6>
-                                            @if (Model.PuedeGestionarClientes)
-                                            {
-                                                <span class="badge badge-success">
-                                                    <i class="fas fa-check"></i> Permitido
-                                                </span>
-                                                <ul class="list-unstyled mt-2 small text-muted">
-                                                    <li>• Alta/baja de clientes</li>
-                                                    <li>• Modificar información</li>
-                                                    <li>• Consultar historial</li>
-                                                </ul>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-secondary">
-                                                    <i class="fas fa-times"></i> Sin acceso
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="card border-@(Model.PuedeGestionarEmpleados ? "warning" : "secondary")">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-user-tie fa-2x @(Model.PuedeGestionarEmpleados ? "text-warning" : "text-muted") mb-2"></i>
-                                            <h6>Gestión de Empleados</h6>
-                                            @if (Model.PuedeGestionarEmpleados)
-                                            {
-                                                <span class="badge badge-warning">
-                                                    <i class="fas fa-check"></i> Permitido
-                                                </span>
-                                                <ul class="list-unstyled mt-2 small text-muted">
-                                                    <li>• Contratar empleados</li>
-                                                    <li>• Modificar cargos</li>
-                                                    <li>• Gestionar salarios</li>
-                                                </ul>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-secondary">
-                                                    <i class="fas fa-times"></i> Sin acceso
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="card border-@(Model.PuedeVerReportes ? "danger" : "secondary")">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-chart-bar fa-2x @(Model.PuedeVerReportes ? "text-danger" : "text-muted") mb-2"></i>
-                                            <h6>Reportes y Estadísticas</h6>
-                                            @if (Model.PuedeVerReportes)
-                                            {
-                                                <span class="badge badge-danger">
-                                                    <i class="fas fa-check"></i> Permitido
-                                                </span>
-                                                <ul class="list-unstyled mt-2 small text-muted">
-                                                    <li>• Reportes financieros</li>
-                                                    <li>• Estadísticas generales</li>
-                                                    <li>• Análisis de negocio</li>
-                                                </ul>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-secondary">
-                                                    <i class="fas fa-times"></i> Sin acceso
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if (!Model.EstaActivo)
-                    {
-                        <hr>
-                        <div class="alert alert-warning" role="alert">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-exclamation-triangle"></i> Empleado Inactivo
-                            </h6>
-                            <p class="mb-0">
-                                Este empleado está marcado como inactivo. No tiene acceso al sistema
-                                y sus permisos están suspendidos hasta que sea reactivado.
-                            </p>
-                        </div>
-                    }
                 </div>
 
-                <!-- Botones de acción -->
-                <div class="card-footer">
-                    <div class="btn-group" role="group">
-                        @if (Model.EstaActivo)
-                        {
-                            <a asp-action="Edit" asp-route-id="@Model.Id"
-                               class="btn btn-warning">
-                                <i class="fas fa-edit"></i> Editar Empleado
-                            </a>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Teléfono</span>
+                        <div class="fs-6 text-white"><i class="bi bi-telephone text-primary me-2"></i>@(Model.Telefono ?? "No registrado")</div>
+                    </div>
+                </div>
 
-                            <a asp-action="Delete" asp-route-id="@Model.Id"
-                               class="btn btn-danger">
-                                <i class="fas fa-user-slash"></i> Desactivar
-                            </a>
-                        }
-                        else
-                        {
-                            <form asp-action="Reactivar" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@Model.Id" />
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-undo"></i> Reactivar Empleado
-                                </button>
-                            </form>
-                        }
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Email</span>
+                        <div class="fs-6 text-white"><i class="bi bi-envelope text-primary me-2"></i>@(Model.Email ?? "No registrado")</div>
+                    </div>
+                </div>
 
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver al listado
-                        </a>
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Fecha de Ingreso</span>
+                        <div class="fs-6 text-white"><i class="bi bi-calendar-check text-success me-2"></i>@Model.FechaIngreso.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Antigüedad</span>
+                        <div class="fs-6 text-white"><i class="bi bi-clock-history me-2"></i>@Model.AntiguedadDias días en el equipo</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Observaciones Laborales</span>
+                        <p class="text-white mb-0 small">
+                            @(string.IsNullOrWhiteSpace(Model.Observaciones) ? "Sin observaciones registradas." : Model.Observaciones)
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@functions {
-    private string GetCargoColor(string cargo)
-    {
-        return cargo switch
-        {
-            "Gerente" => "danger",
-            "Personal Trainer" => "warning",
-            "Instructor" => "info",
-            "Recepcionista" => "success",
-            "Mantenimiento" => "secondary",
-            _ => "primary"
-        };
-    }
-}
-
-<style>
-    .fs-6 {
-        font-size: 0.875rem;
-    }
-
-    .badge {
-        font-size: 0.8em;
-        padding: 4px 8px;
-    }
-
-    .badge-primary {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .badge-success {
-        background-color: #28a745;
-        color: white;
-    }
-
-    .badge-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .badge-warning {
-        background-color: #ffc107;
-        color: black;
-    }
-
-    .badge-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .badge-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-</style>
