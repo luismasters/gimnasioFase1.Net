@@ -12,7 +12,6 @@ namespace AppGimn.Data
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
 
-            // Asegurar que la base de datos esté creada y al día con las migraciones
             await context.Database.MigrateAsync();
 
             // 1. Sembrar Empleados
@@ -115,7 +114,121 @@ namespace AppGimn.Data
                 await context.SaveChangesAsync();
             }
 
-            // 3. Sembrar Usuarios de Identity para cada uno de los 4 Roles Demo
+            // 3. Sembrar Membresías
+            if (!await context.Membresias.AnyAsync())
+            {
+                var membresias = new List<Membresia>
+                {
+                    new Membresia
+                    {
+                        Nombre = "Pase Premium Aura 24/7",
+                        Precio = 75000,
+                        DuracionDias = 30,
+                        Descripcion = "Acceso libre 24/7 a musculación, cardio y clases grupales ilimitadas.",
+                        EstaActivo = true
+                    },
+                    new Membresia
+                    {
+                        Nombre = "Pase Estándar Mensual",
+                        Precio = 45000,
+                        DuracionDias = 30,
+                        Descripcion = "Acceso a sala de musculación en horario regular.",
+                        EstaActivo = true
+                    },
+                    new Membresia
+                    {
+                        Nombre = "Pase VIP Corporativo",
+                        Precio = 120000,
+                        DuracionDias = 30,
+                        Descripcion = "Entrenador personal dedicado, locker privado y acceso al Spa.",
+                        EstaActivo = true
+                    }
+                };
+
+                await context.Membresias.AddRangeAsync(membresias);
+                await context.SaveChangesAsync();
+            }
+
+            // 4. Sembrar Pagos Iniciales
+            if (!await context.Pagos.AnyAsync())
+            {
+                var clienteCarlos = await context.Clientes.FirstOrDefaultAsync(c => c.DNI == "11223344");
+                var membresiaPremium = await context.Membresias.FirstOrDefaultAsync(m => m.Nombre.Contains("Premium"));
+
+                if (clienteCarlos != null && membresiaPremium != null)
+                {
+                    var pagos = new List<Pago>
+                    {
+                        new Pago
+                        {
+                            ClienteId = clienteCarlos.Id,
+                            MembresiaId = membresiaPremium.Id,
+                            Monto = 75000,
+                            FechaPago = DateTime.Now.AddDays(-5),
+                            FechaVencimiento = DateTime.Now.AddDays(25),
+                            MedioPago = "Efectivo",
+                            ComprobanteNumero = "REC-00984",
+                            RecepcionistaEmail = "recepcion@gimnasio.com"
+                        }
+                    };
+
+                    await context.Pagos.AddRangeAsync(pagos);
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            // 5. Sembrar Evaluaciones Físicas
+            if (!await context.EvaluacionesFisicas.AnyAsync())
+            {
+                var clienteCarlos = await context.Clientes.FirstOrDefaultAsync(c => c.DNI == "11223344");
+                if (clienteCarlos != null)
+                {
+                    var evaluaciones = new List<EvaluacionFisica>
+                    {
+                        new EvaluacionFisica
+                        {
+                            ClienteId = clienteCarlos.Id,
+                            FechaEvaluacion = DateTime.Now.AddMonths(-2),
+                            PesoKg = 82.5,
+                            PorcentajeGrasa = 18.2,
+                            MasaMuscularKg = 39.7,
+                            ToraxCm = 100,
+                            CinturaCm = 87,
+                            BicepsCm = 37.0,
+                            Observaciones = "Evaluación inicial de ingreso"
+                        },
+                        new EvaluacionFisica
+                        {
+                            ClienteId = clienteCarlos.Id,
+                            FechaEvaluacion = DateTime.Now.AddMonths(-1),
+                            PesoKg = 80.2,
+                            PorcentajeGrasa = 16.8,
+                            MasaMuscularKg = 40.5,
+                            ToraxCm = 102,
+                            CinturaCm = 84,
+                            BicepsCm = 37.8,
+                            Observaciones = "Re-evaluación mes 2"
+                        },
+                        new EvaluacionFisica
+                        {
+                            ClienteId = clienteCarlos.Id,
+                            FechaEvaluacion = DateTime.Now.AddDays(-5),
+                            PesoKg = 78.5,
+                            PorcentajeGrasa = 14.2,
+                            MasaMuscularKg = 41.8,
+                            ToraxCm = 104,
+                            CinturaCm = 81,
+                            BicepsCm = 38.5,
+                            Observaciones = "Excelente avance en hipertrofia y reducción de grasa"
+                        }
+                    };
+
+                    await context.EvaluacionesFisicas.AddRangeAsync(evaluaciones);
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            // 6. Sembrar Usuarios de Identity
             await CrearUsuarioSiNoExiste(userManager, "admin@gimnasio.com", "Admin123!", "00000000", esAdmin: true, esEmpleado: true, esCliente: false);
             await CrearUsuarioSiNoExiste(userManager, "recepcion@gimnasio.com", "Recep123!", "44556677", esAdmin: false, esEmpleado: true, esCliente: false);
             await CrearUsuarioSiNoExiste(userManager, "instructor@gimnasio.com", "Coach123!", "55667788", esAdmin: false, esEmpleado: true, esCliente: false);

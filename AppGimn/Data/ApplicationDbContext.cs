@@ -1,4 +1,4 @@
-﻿using AppGimn.Models;
+using AppGimn.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,21 +14,20 @@ namespace AppGimn.Data
         // ============ TABLAS DE NEGOCIO ============
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Empleado> Empleados { get; set; }
+        public DbSet<Membresia> Membresias { get; set; }
+        public DbSet<Pago> Pagos { get; set; }
+        public DbSet<Asistencia> Asistencias { get; set; }
+        public DbSet<Rutina> Rutinas { get; set; }
+        public DbSet<EjercicioRutina> EjerciciosRutina { get; set; }
+        public DbSet<EvaluacionFisica> EvaluacionesFisicas { get; set; }
 
         // ============ MÉTODOS AUXILIARES ÚTILES ============
-        // Estos sí son muy prácticos para tu día a día
 
-        /// <summary>
-        /// Obtiene clientes activos ordenados por apellido
-        /// </summary>
         public IQueryable<Cliente> ClientesActivos =>
             Clientes.Where(c => c.EstaActivo)
                    .OrderBy(c => c.Apellido)
                    .ThenBy(c => c.Nombre);
 
-        /// <summary>
-        /// Busca clientes por cualquier campo
-        /// </summary>
         public IQueryable<Cliente> BuscarClientes(string termino)
         {
             if (string.IsNullOrWhiteSpace(termino))
@@ -44,17 +43,11 @@ namespace AppGimn.Data
                 .OrderBy(c => c.Apellido);
         }
 
-        /// <summary>
-        /// Obtiene empleados activos ordenados por apellido
-        /// </summary>
         public IQueryable<Empleado> EmpleadosActivos =>
             Empleados.Where(e => e.EstaActivo)
                     .OrderBy(e => e.Apellido)
                     .ThenBy(e => e.Nombre);
 
-        /// <summary>
-        /// Busca empleados por cualquier campo
-        /// </summary>
         public IQueryable<Empleado> BuscarEmpleados(string termino)
         {
             if (string.IsNullOrWhiteSpace(termino))
@@ -70,12 +63,6 @@ namespace AppGimn.Data
                 .OrderBy(e => e.Apellido);
         }
 
-        // ============ MÉTODOS PARA VINCULAR USUARIO-EMPLEADO ============
-        // Agregar estos métodos a tu ApplicationDbContext
-
-        /// <summary>
-        /// Busca el empleado vinculado a un usuario por DNI
-        /// </summary>
         public async Task<Empleado?> ObtenerEmpleadoPorUsuario(Usuario usuario)
         {
             if (string.IsNullOrEmpty(usuario.DNI))
@@ -84,36 +71,5 @@ namespace AppGimn.Data
             return await Empleados
                 .FirstOrDefaultAsync(e => e.DNI == usuario.DNI && e.EstaActivo);
         }
-
-        /// <summary>
-        /// Verifica si un usuario tiene un empleado vinculado
-        /// </summary>
-        public async Task<bool> UsuarioTieneEmpleado(Usuario usuario)
-        {
-            if (string.IsNullOrEmpty(usuario.DNI))
-                return false;
-
-            return await Empleados
-                .AnyAsync(e => e.DNI == usuario.DNI && e.EstaActivo);
-        }
-
-        /// <summary>
-        /// Obtiene todos los empleados que NO tienen usuario vinculado
-        /// </summary>
-        public IQueryable<Empleado> EmpleadosSinUsuario =>
-            Empleados.Where(e => e.EstaActivo && !Users.Any(u => u.DNI == e.DNI));
-
-        /// <summary>
-        /// Obtiene todos los usuarios que NO tienen empleado vinculado
-        /// </summary>
-        public IQueryable<Usuario> UsuariosSinEmpleado =>
-            Users.Where(u => !string.IsNullOrEmpty(u.DNI) &&
-                             u.EsEmpleado &&
-                             !Empleados.Any(e => e.DNI == u.DNI && e.EstaActivo));
-
-
-
-
-
     }
 }
