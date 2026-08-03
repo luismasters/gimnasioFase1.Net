@@ -78,7 +78,6 @@ namespace AppGimn.Controllers
             ViewBag.ClienteNombre = cliente != null ? cliente.NombreCompleto : "Carlos Gómez";
             ViewBag.MiembroDesde = cliente != null ? cliente.FechaInscripcion.ToString("MMMM yyyy") : "Marzo 2024";
 
-            // Obtener último pago/membresía de la base de datos real
             var ultimoPago = cliente != null 
                 ? await _context.Pagos.Include(p => p.Membresia).Where(p => p.ClienteId == cliente.Id).OrderByDescending(p => p.FechaPago).FirstOrDefaultAsync()
                 : null;
@@ -87,7 +86,6 @@ namespace AppGimn.Controllers
             ViewBag.ProximaClase = "Pilates Reformer - Hoy 18:00 hs";
             ViewBag.EntrenadorAsignado = "Marcus Vance (Head Coach)";
 
-            // Obtener última evaluación física real
             var ultimaEvaluacion = cliente != null
                 ? await _context.EvaluacionesFisicas.Where(e => e.ClienteId == cliente.Id).OrderByDescending(e => e.FechaEvaluacion).FirstOrDefaultAsync()
                 : null;
@@ -130,7 +128,7 @@ namespace AppGimn.Controllers
             return View();
         }
 
-        // ============ RUTA 3 - RECEPCIONISTA (ESTOY TRABAJANDO - ALTA DENSIDAD) ============
+        // ============ RUTA 3 - RECEPCIONISTA: TERMINAL DE CHECK-IN (SOLO ENTRADAS) ============
         public async Task<IActionResult> RecepcionPanel()
         {
             var usuario = await ObtenerUsuarioActual();
@@ -141,19 +139,18 @@ namespace AppGimn.Controllers
 
             var clientesPresentes = await _context.Clientes.Where(c => c.EstaActivo).ToListAsync();
 
-            // Calcular recaudación real del día en EF Core
             var recaudacionHoy = await _context.Pagos
                 .Where(p => p.FechaPago.Date == DateTime.Today)
                 .SumAsync(p => (decimal?)p.Monto) ?? 145000m;
 
             ViewBag.ClientesPresentesCount = clientesPresentes.Count;
-            ViewBag.VencimientosCount = 5;
             ViewBag.CajaDiaTotal = recaudacionHoy.ToString("C");
 
             return View(clientesPresentes);
         }
 
-        public async Task<IActionResult> RecepcionCobros()
+        // ============ RUTA 3 - RECEPCIONISTA: COBROS & GESTIÓN DE VENCIDOS ============
+        public async Task<IActionResult> RecepcionCobros(string? busquedaDni)
         {
             var usuario = await ObtenerUsuarioActual();
             if (usuario != null && usuario.EsCliente && !usuario.EsAdmin && !usuario.EsEmpleado)
@@ -161,64 +158,115 @@ namespace AppGimn.Controllers
                 return RedirectToAction("ClientePanel");
             }
 
-            // Consultar transacciones de pago reales
-            var pagos = await _context.Pagos
+            var clientes = await _context.Clientes.Where(c => c.EstaActivo).ToListAsync();
+
+            var clienteIds = clientes.Select(c => c.Id).ToList();
+            var ultimosPagosList = await _context.Pagos
+                .Where(p => clienteIds.Contains(p.ClienteId))
+                .GroupBy(p => p.ClienteId)
+                .Select(g => g.OrderByDescending(p => p.FechaPago).FirstOrDefault())
+                .ToListAsync();
+
+            var ultimosPagosDict = ultimosPagosList
+                .Where(p => p != null)
+                .ToDictionary(p => p!.ClienteId, p => p!);
+
+            var sociosVencidos = clientes.Where(c => 
+                !ultimosPagosDict.ContainsKey(c.Id) || 
+                ultimosPagosDict[c.Id].FechaVencimiento < DateTime.Now.Date
+            ).ToList();
+
+            Cliente? clienteBuscado = null;
+            bool socioExiste = true;
+
+            if (!string.IsNullOrWhiteSpace(busquedaDni))
+            {
+                string terminoClean = busquedaDni.Trim().ToLower();
+                clienteBuscado = await _context.Clientes.FirstOrDefaultAsync(c => 
+                    c.DNI == terminoClean || 
+                    c.Nombre.ToLower().Contains(terminoClean) || 
+                    c.Apellido.ToLower().Contains(terminoClean) ||
+                    (c.Nombre + " " + c.Apellido).ToLower().Contains(terminoClean)
+                );
+
+                if (clienteBuscado == null)
+                {
+                    socioExiste = false;
+                }
+            }
+
+            ViewBag.BusquedaDni = busquedaDni;
+            ViewBag.ClienteBuscado = clienteBuscado;
+            ViewBag.SocioExiste = socioExiste;
+            ViewBag.SociosVencidos = sociosVencidos;
+            ViewBag.MembresiasDisponibles = await _context.Membresias.Where(m => m.EstaActivo).ToListAsync();
+
+            var pagosDelDia = await _context.Pagos
                 .Include(p => p.Cliente)
                 .Include(p => p.Membresia)
                 .OrderByDescending(p => p.FechaPago)
                 .ToListAsync();
 
-            ViewBag.MembresiasDisponibles = await _context.Membresias.Where(m => m.EstaActivo).ToListAsync();
-
-            return View(pagos);
+            return View(pagosDelDia);
         }
 
-        // ============ REGISTRAR PAGO REAL DE CUOTA EN BASE DE DATOS ============
+        // ============ REGISTRAR PAGO REAL Y REMOVER DE LA LISTA DE VENCIDOS ============
         [HttpPost]
-        public async Task<IActionResult> ProcesarPagoCobro(int clienteId, int membresiaId, string medioPago)
+        public async Task<IActionResult> ProcesarPagoCobro(string dniCliente, int membresiaId, string medioPago)
         {
-            var cliente = await _context.Clientes.FindAsync(clienteId);
-            var membresia = await _context.Membresias.FindAsync(membresiaId);
-
-            if (cliente != null && membresia != null)
+            var cliente = await _context.Clientes.FirstOrDefaultAsync(c => c.DNI == dniCliente);
+            if (cliente == null)
             {
-                var usuarioActual = await ObtenerUsuarioActual();
-                var nuevoPago = new Pago
-                {
-                    ClienteId = cliente.Id,
-                    MembresiaId = membresia.Id,
-                    Monto = membresia.Precio,
-                    FechaPago = DateTime.Now,
-                    FechaVencimiento = DateTime.Now.AddDays(membresia.DuracionDias),
-                    MedioPago = medioPago ?? "Efectivo",
-                    ComprobanteNumero = $"REC-{Random.Shared.Next(10000, 99999)}",
-                    RecepcionistaEmail = usuarioActual?.Email ?? "recepcion@gimnasio.com"
-                };
-
-                await _context.Pagos.AddAsync(nuevoPago);
-                await _context.SaveChangesAsync();
-
-                TempData["MensajeExito"] = $"¡Pago de {membresia.Precio:C} registrado con éxito para {cliente.NombreCompleto}! Comprobante {nuevoPago.ComprobanteNumero} emitido.";
+                TempData["MensajeError"] = $"No se encontró ningún cliente registrado con el DNI '{dniCliente}'. Debe registrarlo primero.";
+                return RedirectToAction("RecepcionCobros", new { busquedaDni = dniCliente });
             }
+
+            var membresia = await _context.Membresias.FindAsync(membresiaId);
+            if (membresia == null)
+            {
+                TempData["MensajeError"] = "Debe seleccionar un plan de membresía válido.";
+                return RedirectToAction("RecepcionCobros");
+            }
+
+            var usuarioActual = await ObtenerUsuarioActual();
+            var nuevoPago = new Pago
+            {
+                ClienteId = cliente.Id,
+                MembresiaId = membresia.Id,
+                Monto = membresia.Precio,
+                FechaPago = DateTime.Now,
+                FechaVencimiento = DateTime.Now.AddDays(membresia.DuracionDias),
+                MedioPago = medioPago ?? "Efectivo",
+                ComprobanteNumero = $"REC-{Random.Shared.Next(10000, 99999)}",
+                RecepcionistaEmail = usuarioActual?.Email ?? "recepcion@gimnasio.com"
+            };
+
+            await _context.Pagos.AddAsync(nuevoPago);
+            await _context.SaveChangesAsync();
+
+            TempData["MensajeExito"] = $"¡Pago de {membresia.Precio:C} procesado con éxito para {cliente.NombreCompleto} (DNI: {cliente.DNI})! Membresía activada hasta el {nuevoPago.FechaVencimiento:dd/MM/yyyy}. El socio ha sido actualizado y removido de la lista de vencidos.";
 
             return RedirectToAction("RecepcionCobros");
         }
 
-        // ============ VALIDAR CHECK-IN REAL Y REGISTRAR ASISTENCIA EN BASE DE DATOS ============
+        // ============ VALIDAR CHECK-IN REAL EN MOLINETE Y RETORNAR RESULTADO JSON ============
         [HttpPost]
         public async Task<IActionResult> ValidarCheckinDni(string dni)
         {
             var cliente = await _context.Clientes.FirstOrDefaultAsync(c => c.DNI == dni);
             if (cliente == null)
             {
-                return Json(new { ok = false, estado = "NO_ENCONTRADO", mensaje = "Socio no registrado en la base de datos." });
+                return Json(new { 
+                    ok = false, 
+                    estado = "NO_REGISTRADO", 
+                    mensaje = "El DNI ingresado no pertenece a ningún socio. ¡Debe registrarse primero!" 
+                });
             }
 
             var ultimoPago = await _context.Pagos.Where(p => p.ClienteId == cliente.Id).OrderByDescending(p => p.FechaPago).FirstOrDefaultAsync();
 
-            bool alDia = ultimoPago == null || ultimoPago.FechaVencimiento >= DateTime.Now.Date;
+            bool alDia = ultimoPago != null && ultimoPago.FechaVencimiento >= DateTime.Now.Date;
 
-            // Registrar asistencia real en la base de datos
             var asistencia = new Asistencia
             {
                 ClienteId = cliente.Id,
@@ -236,7 +284,7 @@ namespace AppGimn.Controllers
                 nombre = cliente.NombreCompleto,
                 dni = cliente.DNI,
                 estado = alDia ? "AL_DIA" : "VENCIDO",
-                vencimiento = ultimoPago != null ? ultimoPago.FechaVencimiento.ToString("dd/MM/yyyy") : "Sin registro de pago"
+                vencimiento = ultimoPago != null ? ultimoPago.FechaVencimiento.ToString("dd/MM/yyyy") : "Sin registro de cuota"
             });
         }
 
