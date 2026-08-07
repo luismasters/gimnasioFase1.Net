@@ -2,137 +2,195 @@
 
 @{
     ViewData["Title"] = "Gestión de Clientes - AppGimn Premium";
+    var planDict = ViewBag.PlanDict as Dictionary<int, string> ?? new Dictionary<int, string>();
+    var estadoDict = ViewBag.EstadoSuscripcionDict as Dictionary<int, bool> ?? new Dictionary<int, bool>();
+
+    int totalClientes = Model?.Count() ?? 0;
+    int alDia = Model?.Count(c => estadoDict.GetValueOrDefault(c.Id, false)) ?? 0;
+    int vencidos = totalClientes - alDia;
 }
 
 <div class="recepcion-layout">
     <partial name="_RecepcionSidebar" />
 
     <div class="recepcion-content container-fluid px-lg-4 py-4 pb-5">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
-        <div>
-            <h2 class="fw-bold text-white mb-1">
-                <i class="bi bi-people text-primary me-2"></i>Gestión de Clientes
-            </h2>
-            <p class="text-secondary small mb-0">Administra y consulta la información del alumnado del gimnasio</p>
+        <!-- HEADER DE SECCIÓN -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+            <div>
+                <h2 class="fw-bold text-white mb-1">
+                    <i class="bi bi-people text-primary me-2"></i>Padrón de Clientes
+                </h2>
+                <p class="text-secondary small mb-0">Administra y consulta la información completa del alumnado del gimnasio</p>
+            </div>
+            <div>
+                <a asp-action="Create" class="btn btn-purple py-2 px-3 fw-bold">
+                    <i class="bi bi-person-plus-fill me-1"></i> Registrar Nuevo Cliente
+                </a>
+            </div>
         </div>
-        <div>
-            <a asp-action="Create" class="btn btn-purple">
-                <i class="bi bi-person-plus me-1"></i> Registrar Nuevo Cliente
-            </a>
-        </div>
-    </div>
 
-    @if (TempData["MensajeExito"] != null)
-    {
-        <div class="alert alert-success bg-dark border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> <strong>¡Éxito!</strong> @TempData["MensajeExito"]
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-        </div>
-    }
+        @if (TempData["MensajeExito"] != null)
+        {
+            <div class="alert alert-success bg-dark border-success text-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> <strong>¡Éxito!</strong> @TempData["MensajeExito"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        }
 
-    <!-- FILTER & SEARCH CARD -->
-    <div class="saas-card p-4 mb-4">
-        <form asp-action="Index" method="get">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" name="buscar" value="@ViewData["FiltroActual"]"
-                               class="form-control" placeholder="Buscar por nombre, apellido, DNI o email..." />
+        <!-- TARJETAS DE INDICADORES / KPIS -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="saas-card p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Total Socios</div>
+                        <div class="fs-3 fw-bold text-white mb-0">@totalClientes</div>
+                    </div>
+                    <div class="brand-badge-purple" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                        <i class="bi bi-people"></i>
                     </div>
                 </div>
-                <div class="col-md-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-purple flex-grow-1">
-                        <i class="bi bi-search me-1"></i> Buscar
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary-saas">
-                        <i class="bi bi-arrow-counterclockwise"></i> Limpiar
-                    </a>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="saas-card p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Cuotas Al Día</div>
+                        <div class="fs-3 fw-bold text-success mb-0">@alDia</div>
+                    </div>
+                    <div class="rounded-3 bg-success bg-opacity-20 text-success d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
                 </div>
             </div>
-        </form>
-    </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="saas-card p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Cuotas Vencidas</div>
+                        <div class="fs-3 fw-bold text-danger mb-0">@vencidos</div>
+                    </div>
+                    <div class="rounded-3 bg-danger bg-opacity-20 text-danger d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="saas-card p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase">Estado Padrón</div>
+                        <div class="fs-6 fw-bold text-info mb-0 mt-1">100% Actualizado</div>
+                    </div>
+                    <div class="rounded-3 bg-info bg-opacity-20 text-info d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- CLIENTS TABLE CARD -->
-    <div class="saas-card overflow-hidden">
-        <div class="table-responsive">
-            <table class="table table-saas mb-0">
-                <thead>
-                    <tr>
-                        <th>Socio</th>
-                        <th>DNI</th>
-                        <th>Edad</th>
-                        <th>Suscripción</th>
-                        <th>Cuota</th>
-                        <th>Teléfono</th>
-                        <th class="text-end">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var item in Model)
-                    {
-                        var plan = ((Dictionary<int, string>)ViewBag.PlanDict).GetValueOrDefault(item.Id, "Sin plan");
-                        var cuotaAlDia = ((Dictionary<int, bool>)ViewBag.EstadoSuscripcionDict).GetValueOrDefault(item.Id, false);
+        <!-- TARJETA DE BUSCADOR Y FILTROS -->
+        <div class="saas-card p-4 mb-4">
+            <form asp-action="Index" method="get">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="buscar" value="@ViewData["FiltroActual"]"
+                                   class="form-control" placeholder="Buscar por nombre, apellido, DNI o email..." />
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-purple flex-grow-1 fw-bold">
+                            <i class="bi bi-search me-1"></i> Buscar
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary-saas">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLA PRINCIPAL DE SOCIOS -->
+        <div class="saas-card overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-saas mb-0 align-middle">
+                    <thead>
                         <tr>
-                            <td class="fw-semibold text-white">
-                                <div class="d-flex align-items-center gap-2">
-                                    @{ ViewBag.AvatarSize = 36; }
-                                    <partial name="_ClienteAvatar" model="item" />
-                                    @item.NombreCompleto
-                                </div>
-                            </td>
-                            <td><code class="text-light">@item.DNI</code></td>
-                            <td>@item.Edad años</td>
-                            <td>
-                                <span class="text-light">@plan</span>
-                            </td>
-                            <td>
-                                @if (cuotaAlDia)
-                                {
-                                    <span class="saas-badge saas-badge-success">
-                                        <i class="bi bi-check-circle-fill"></i> Activa
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="saas-badge saas-badge-danger">
-                                        <i class="bi bi-x-circle-fill"></i> Vencida
-                                    </span>
-                                }
-                            </td>
-                            <td>@(item.Telefono ?? "-")</td>
-                            <td class="text-end">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Ver Detalle">
-                                        <i class="bi bi-eye text-info"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Editar">
-                                        <i class="bi bi-pencil text-warning"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Eliminar/Desactivar">
-                                        <i class="bi bi-trash text-danger"></i>
-                                    </a>
-                                </div>
+                            <th>Socio</th>
+                            <th>DNI</th>
+                            <th>Edad</th>
+                            <th>Plan Membresía</th>
+                            <th>Estado Cuota</th>
+                            <th>Contacto</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var plan = planDict.GetValueOrDefault(item.Id, "Sin plan activo");
+                            var cuotaAlDia = estadoDict.GetValueOrDefault(item.Id, false);
+                            <tr>
+                                <td class="fw-semibold text-white">
+                                    <div class="d-flex align-items-center gap-2">
+                                        @{ ViewBag.AvatarSize = 38; }
+                                        <partial name="_ClienteAvatar" model="item" />
+                                        <div>
+                                            <div class="fw-bold text-white">@item.NombreCompleto</div>
+                                            <small class="text-muted d-block" style="font-size: 0.75rem;">Inscrito: @item.FechaInscripcion.ToString("dd/MM/yyyy")</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><code class="text-light fs-6">@item.DNI</code></td>
+                                <td>@item.Edad años</td>
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-light border border-secondary fw-medium px-2 py-1">@plan</span>
+                                </td>
+                                <td>
+                                    @if (cuotaAlDia)
+                                    {
+                                        <span class="saas-badge saas-badge-success">
+                                            <i class="bi bi-check-circle-fill"></i> Activa
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="saas-badge saas-badge-danger">
+                                            <i class="bi bi-x-circle-fill"></i> Vencida
+                                        </span>
+                                    }
+                                </td>
+                                <td class="small text-muted">@(item.Telefono ?? item.Email ?? "-")</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Ver Ficha">
+                                            <i class="bi bi-eye text-info"></i> Ficha
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Editar">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-secondary-saas" title="Dar de Baja">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 mb-3 d-block opacity-50 text-purple"></i>
+                                No se encontraron clientes registrados o coincidentes con la búsqueda.
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fa-3x mb-3 d-block opacity-50"></i>
-                            No se encontraron clientes registrados o coincidentes con la búsqueda.
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
     </div>
 </div>

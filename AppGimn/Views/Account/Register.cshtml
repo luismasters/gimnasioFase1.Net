@@ -1,113 +1,176 @@
 @model AppGimn.Models.RegistroExtendidoViewModel
 @{
+    Layout = null;
     ViewData["Title"] = "Crear Cuenta - AppGimn Premium";
 }
 
-<div class="row justify-content-center py-5">
-    <div class="col-md-8 col-lg-6">
-        <div class="saas-card p-4 p-md-5">
-            <!-- LOGO Y ENCABEZADO -->
-            <div class="text-center mb-4">
-                <div class="brand-badge-purple mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.5rem;">
-                    <i class="bi bi-person-plus-fill"></i>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom Design System -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="login-split-page">
+
+    <div class="container-fluid p-0">
+        <div class="row g-0 min-vh-100">
+            <!-- COLUMNA IZQUIERDA: HERO CON IMAGEN (50% DESKTOP) -->
+            <div class="col-lg-6 login-split-hero">
+                <!-- LOGO SUPERIOR -->
+                <a class="login-hero-brand" asp-controller="Home" asp-action="Index">
+                    <div class="brand-badge-purple">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <span>App<span style="color: var(--primary-light);">Gimn</span></span>
+                </a>
+
+                <!-- TARJETA FLOTANTE DE PREVISUALIZACIÓN -->
+                <div class="login-hero-preview-container">
+                    <div class="login-hero-preview-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle bg-purple text-white d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: #8B3DFF;">
+                                <i class="bi bi-person-check-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-white mb-0">Registro de Usuario</h6>
+                                <span class="small text-white-50">Vinculación por DNI</span>
+                            </div>
+                        </div>
+                        <div class="bg-white bg-opacity-10 rounded-3 p-3 text-white-50 mb-3" style="font-size: 0.82rem;">
+                            <div class="d-flex align-items-center gap-2 mb-1 text-white fw-semibold">
+                                <i class="bi bi-info-circle text-info"></i> Requisito del Sistema:
+                            </div>
+                            Tu DNI debe estar previamente cargado en la base de datos de socios o personal del gimnasio.
+                        </div>
+                        <div class="d-flex justify-content-between text-white-50" style="font-size: 0.75rem;">
+                            <span><i class="bi bi-shield-lock me-1"></i> SSL 256-bit</span>
+                            <span><i class="bi bi-check-circle me-1"></i> Verificación Instantánea</span>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="fw-bold text-white mb-1">Crear Cuenta de Usuario</h3>
-                <p class="text-secondary small">Vincúlate con tu DNI como cliente o empleado del gimnasio</p>
+
+                <!-- SECCIÓN INFERIOR DE TEXTO -->
+                <div class="login-hero-footer">
+                    <h1 class="login-hero-title">Únete a la experiencia AURA Fitness.</h1>
+                    <p class="login-hero-desc">
+                        Crea tu cuenta de acceso digital para gestionar tus rutinas, reservar clases grupales y consultar tu estado de membresía en tiempo real.
+                    </p>
+                </div>
             </div>
 
-            <form asp-action="Register" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-
-                <!-- EMAIL -->
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label">
-                        <i class="bi bi-envelope text-primary me-1"></i> Correo Electrónico
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted">
-                            <i class="bi bi-at"></i>
-                        </span>
-                        <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
-                    </div>
-                    <span asp-validation-for="Email" class="text-danger small"></span>
-                </div>
-
-                <!-- DNI -->
-                <div class="mb-3">
-                    <label asp-for="DNI" class="form-label">
-                        <i class="bi bi-card-heading text-primary me-1"></i> Número de DNI
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted">
-                            <i class="bi bi-person-vcard"></i>
-                        </span>
-                        <input asp-for="DNI" class="form-control" placeholder="12345678" />
-                    </div>
-                    <div class="form-text text-muted small mt-1">
-                        Debe coincidir con tu DNI de cliente o empleado registrado en el sistema.
-                    </div>
-                    <span asp-validation-for="DNI" class="text-danger small"></span>
-                </div>
-
-                <!-- RELACIÓN CON EL GIMNASIO (ROLES) -->
-                <div class="saas-card p-3 mb-3" style="background-color: var(--bg-surface-variant);">
-                    <label class="form-label text-white fw-bold mb-2">
-                        <i class="bi bi-diagram-3 text-primary me-1"></i> ¿Cuál es tu relación con el gimnasio?
-                    </label>
-                    <div class="form-check mb-2">
-                        <input asp-for="EsCliente" class="form-check-input bg-dark border-secondary" />
-                        <label asp-for="EsCliente" class="form-check-label text-white small">
-                            Soy cliente / alumno del gimnasio
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input asp-for="EsEmpleado" class="form-check-input bg-dark border-secondary" />
-                        <label asp-for="EsEmpleado" class="form-check-label text-white small">
-                            Soy empleado / personal del gimnasio
-                        </label>
-                    </div>
-                </div>
-
-                <!-- CONTRASEÑA -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label asp-for="Password" class="form-label">
-                            <i class="bi bi-lock text-primary me-1"></i> Contraseña
-                        </label>
-                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="ConfirmPassword" class="form-label">
-                            <i class="bi bi-shield-check text-primary me-1"></i> Confirmar
-                        </label>
-                        <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <!-- BOTÓN CREAR CUENTA -->
-                <div class="d-grid mb-3">
-                    <button type="submit" class="btn btn-purple btn-lg py-3">
-                        <i class="bi bi-person-plus-fill me-1"></i> Registrarse Ahora
-                    </button>
-                </div>
-            </form>
-
-            <hr class="border-secondary opacity-25 my-4" />
-
-            <div class="text-center small">
-                <p class="text-secondary mb-0">
-                    ¿Ya tienes una cuenta registrada?
-                    <a asp-action="Login" class="text-decoration-none fw-bold" style="color: var(--primary-light);">
+            <!-- COLUMNA DERECHA: FORMULARIO DE REGISTRO (50% DESKTOP) -->
+            <div class="col-lg-6 login-split-form-wrapper py-5">
+                
+                <!-- BOTÓN SUPERIOR PARA VOLVER -->
+                <div class="position-absolute top-0 end-0 p-4">
+                    <a asp-action="Login" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 text-decoration-none fw-semibold">
                         <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
                     </a>
-                </p>
+                </div>
+
+                <div class="login-form-box" style="max-width: 480px;">
+                    <!-- ENCABEZADO -->
+                    <h2 class="login-form-title">Crear Cuenta</h2>
+                    <p class="login-form-subtitle">Ingresa tus datos y vincula tu perfil con tu número de DNI.</p>
+
+                    <form asp-action="Register" method="post" id="registerForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger small mb-3 p-2 rounded-3"></div>
+
+                        <!-- CORREO ELECTRÓNICO -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.88rem;">Correo electrónico</label>
+                            <div class="login-input-group">
+                                <i class="bi bi-envelope login-input-icon"></i>
+                                <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger small ms-1"></span>
+                        </div>
+
+                        <!-- DNI -->
+                        <div class="mb-3">
+                            <label asp-for="DNI" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.88rem;">Número de DNI</label>
+                            <div class="login-input-group">
+                                <i class="bi bi-card-heading login-input-icon"></i>
+                                <input asp-for="DNI" class="form-control" placeholder="12345678" />
+                            </div>
+                            <div class="form-text text-muted small mt-1" style="font-size: 0.78rem;">
+                                Debe coincidir con tu DNI registrado en la recepción del gimnasio.
+                            </div>
+                            <span asp-validation-for="DNI" class="text-danger small ms-1"></span>
+                        </div>
+
+                        <!-- VINCULACIÓN DE ROL -->
+                        <div class="border rounded-3 p-3 mb-3 bg-light">
+                            <label class="form-label text-dark fw-bold mb-2" style="font-size: 0.88rem;">
+                                <i class="bi bi-diagram-3 me-1 text-purple" style="color: #8B3DFF;"></i> Selección de Vínculo
+                            </label>
+                            <div class="form-check mb-2">
+                                <input asp-for="EsCliente" class="form-check-input" id="checkEsCliente" />
+                                <label asp-for="EsCliente" class="form-check-label text-dark fw-medium" style="font-size: 0.88rem;">
+                                    Soy cliente / socio del gimnasio
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="EsEmpleado" class="form-check-input" id="checkEsEmpleado" />
+                                <label asp-for="EsEmpleado" class="form-check-label text-dark fw-medium" style="font-size: 0.88rem;">
+                                    Soy empleado / personal del gimnasio
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- CONTRASEÑAS EN 2 COLUMNAS -->
+                        <div class="row g-2 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.88rem;">Contraseña</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-lock login-input-icon"></i>
+                                    <input asp-for="Password" id="regPassword" class="form-control" placeholder="••••••••" />
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small ms-1"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.88rem;">Confirmar</label>
+                                <div class="login-input-group">
+                                    <i class="bi bi-shield-check login-input-icon"></i>
+                                    <input asp-for="ConfirmPassword" id="regConfirmPassword" class="form-control" placeholder="••••••••" />
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small ms-1"></span>
+                            </div>
+                        </div>
+
+                        <!-- BOTÓN REGISTRARSE -->
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-login-submit">
+                                <i class="bi bi-person-plus-fill me-1"></i> Registrarse Ahora
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- ENLACE A LOGIN -->
+                    <div class="text-center pt-2" style="font-size: 0.9rem;">
+                        <span class="text-secondary me-1">¿Ya tienes una cuenta registrada?</span>
+                        <a asp-action="Login" class="fw-bold text-decoration-none" style="color: #8B3DFF;">
+                            Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

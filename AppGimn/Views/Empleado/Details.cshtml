@@ -1,78 +1,112 @@
 @model AppGimn.Models.Empleado
 
 @{
-    ViewData["Title"] = "Detalle de Empleado - AppGimn";
+    ViewData["Title"] = "Ficha de Empleado - AppGimn Premium";
 }
 
-<div class="row justify-content-center py-3">
-    <div class="col-lg-8">
-        <div class="saas-card p-4 p-md-5">
-            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
-                <div>
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2">
-                        Cargo: @Model.Cargo
-                    </span>
-                    <h3 class="fw-bold text-white mb-0">@Model.NombreCompleto</h3>
-                </div>
-                <div class="d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-purple btn-sm">
-                        <i class="bi bi-pencil me-1"></i> Editar
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
-                        <i class="bi bi-arrow-left me-1"></i> Volver
-                    </a>
-                </div>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">DNI</span>
-                        <div class="fs-5 text-white fw-bold"><code>@Model.DNI</code></div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="saas-card p-4 p-md-5">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75 gap-3">
+                    <div>
+                        <span class="saas-badge @(Model.EstaActivo ? "saas-badge-success" : "saas-badge-danger") mb-2">
+                            <i class="bi @(Model.EstaActivo ? "bi-check-circle-fill" : "bi-x-circle-fill") me-1"></i>
+                            @(Model.EstaActivo ? "Empleado Activo" : "Empleado Inactivo")
+                        </span>
+                        <h2 class="fw-bold text-white mb-0">@Model.NombreCompleto</h2>
+                        <span class="badge bg-purple-subtle text-light border border-purple mt-1 px-3 py-1 fs-6">
+                            Cargo: @Model.Cargo
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-purple py-2 px-3 fw-bold">
+                            <i class="bi bi-pencil me-1"></i> Editar Ficha
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary-saas py-2 px-3">
+                            <i class="bi bi-arrow-left me-1"></i> Volver al Personal
+                        </a>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Salario</span>
-                        <div class="fs-5 text-success fw-bold">@(Model.Salario.HasValue ? Model.Salario.Value.ToString("C") : "No especificado")</div>
-                    </div>
-                </div>
+                <div class="row g-4">
+                    <!-- AVATAR Y CARNET DE EMPLEADO -->
+                    <div class="col-md-4">
+                        <div class="saas-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="background-color: var(--bg-surface-variant);">
+                            <div>
+                                <div class="rounded-circle bg-purple text-white d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 100px; height: 100px; font-size: 2.5rem; background: #8B3DFF;">
+                                    <i class="bi bi-person-workspace"></i>
+                                </div>
+                                <h4 class="fw-bold text-white mb-1">@Model.NombreCompleto</h4>
+                                <p class="text-secondary small mb-3">@Model.Cargo</p>
+                                
+                                <div class="p-3 bg-dark rounded-3 border border-secondary text-start mb-3" style="font-size: 0.82rem;">
+                                    <div class="text-muted mb-1"><i class="bi bi-card-checklist text-primary me-1"></i> Legajo de Personal:</div>
+                                    <div class="fw-bold text-white fs-6">#EMP-@Model.Id.ToString("D4")</div>
+                                </div>
+                            </div>
 
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Teléfono</span>
-                        <div class="fs-6 text-white"><i class="bi bi-telephone text-primary me-2"></i>@(Model.Telefono ?? "No registrado")</div>
+                            <div class="pt-3 border-top border-secondary">
+                                <span class="small text-muted d-block">Fecha de Contratación</span>
+                                <span class="fw-bold text-white"><i class="bi bi-calendar-check text-success me-1"></i>@Model.FechaIngreso.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Email</span>
-                        <div class="fs-6 text-white"><i class="bi bi-envelope text-primary me-2"></i>@(Model.Email ?? "No registrado")</div>
-                    </div>
-                </div>
+                    <!-- DETALLES CONTRACTUALES -->
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Número de DNI</span>
+                                    <div class="fs-5 text-white fw-bold"><code>@Model.DNI</code></div>
+                                </div>
+                            </div>
 
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Fecha de Ingreso</span>
-                        <div class="fs-6 text-white"><i class="bi bi-calendar-check text-success me-2"></i>@Model.FechaIngreso.ToString("dd/MM/yyyy")</div>
-                    </div>
-                </div>
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Salario Base Mensual</span>
+                                    <div class="fs-5 text-success fw-bold">@(Model.Salario.HasValue ? Model.Salario.Value.ToString("C") : "No especificado")</div>
+                                </div>
+                            </div>
 
-                <div class="col-md-6">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Antigüedad</span>
-                        <div class="fs-6 text-white"><i class="bi bi-clock-history me-2"></i>@Model.AntiguedadDias días en el equipo</div>
-                    </div>
-                </div>
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Teléfono Móvil</span>
+                                    <div class="fs-6 text-white"><i class="bi bi-telephone text-primary me-2"></i>@(Model.Telefono ?? "No registrado")</div>
+                                </div>
+                            </div>
 
-                <div class="col-12">
-                    <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
-                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Observaciones Laborales</span>
-                        <p class="text-white mb-0 small">
-                            @(string.IsNullOrWhiteSpace(Model.Observaciones) ? "Sin observaciones registradas." : Model.Observaciones)
-                        </p>
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Correo Electrónico</span>
+                                    <div class="fs-6 text-white"><i class="bi bi-envelope text-primary me-2"></i>@(Model.Email ?? "No registrado")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Fecha de Ingreso</span>
+                                    <div class="fs-6 text-white"><i class="bi bi-calendar-check text-success me-2"></i>@Model.FechaIngreso.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Antigüedad en Plantilla</span>
+                                    <div class="fs-6 text-white"><i class="bi bi-clock-history text-info me-2"></i>@Model.AntiguedadDias días de servicio</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
+                                    <span class="text-muted small fw-bold text-uppercase d-block mb-1">Observaciones Laborales / Notas</span>
+                                    <p class="text-white mb-0 small">
+                                        @(string.IsNullOrWhiteSpace(Model.Observaciones) ? "Sin observaciones de legajo registradas." : Model.Observaciones)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

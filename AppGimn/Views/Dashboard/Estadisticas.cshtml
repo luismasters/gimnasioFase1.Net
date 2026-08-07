@@ -1,99 +1,190 @@
 @model AppGimn.Models.EstadisticasViewModel
 
 @{
-    ViewData["Title"] = "Estadísticas - AppGimn Pro";
+    ViewData["Title"] = "Estadísticas & Analítica - AppGimn Premium";
 }
 
-<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
-    <div>
-        <h2 class="fw-bold text-dark mb-1">
-            <i class="bi bi-bar-chart-line text-primary me-2"></i>Estadísticas y Analítica
-        </h2>
-        <p class="text-secondary small mb-0">Evolución histórica de inscripciones y antigüedad de la plantilla</p>
-    </div>
-    <div>
-        <a asp-action="Index" class="btn btn-outline-slate btn-sm">
-            <i class="bi bi-arrow-left me-1"></i> Volver al Dashboard
-        </a>
-    </div>
-</div>
-
-<div class="row g-4">
-    <!-- CLIENTES POR MES -->
-    <div class="col-lg-6">
-        <div class="card-minimal overflow-hidden h-100">
-            <div class="p-4 border-bottom">
-                <h5 class="fw-bold text-dark mb-0">
-                    <i class="bi bi-calendar-range text-primary me-2"></i>Inscripciones por Mes
-                </h5>
-            </div>
-
-            @if (Model.ClientesPorMes != null && Model.ClientesPorMes.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-minimal mb-0">
-                        <thead>
-                            <tr>
-                                <th>Mes / Año</th>
-                                <th class="text-end">Nuevas Inscripciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var mes in Model.ClientesPorMes)
-                            {
-                                <tr>
-                                    <td class="fw-semibold text-dark">@mes.NombreMes</td>
-                                    <td class="text-end fw-bold text-primary">@mes.Cantidad cliente(s)</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="p-4 text-muted small">No hay suficientes registros históricos en los últimos meses.</div>
-            }
+<div class="container py-4">
+    <!-- ENCABEZADO -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+        <div>
+            <span class="saas-badge saas-badge-purple mb-2">
+                <i class="bi bi-bar-chart-line me-1"></i> METRICAS & METRICAS HISTÓRICAS
+            </span>
+            <h2 class="fw-bold text-white mb-1">
+                <i class="bi bi-graph-up-arrow text-primary me-2"></i>Reportes de Rendimiento Operativo
+            </h2>
+            <p class="text-secondary small mb-0">Evolución histórica de inscripciones, antigüedad de la plantilla e ingresos</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary-saas py-2 px-3">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Dashboard
+            </a>
         </div>
     </div>
 
-    <!-- EMPLEADOS POR ANTIGÜEDAD -->
-    <div class="col-lg-6">
-        <div class="card-minimal overflow-hidden h-100">
-            <div class="p-4 border-bottom">
-                <h5 class="fw-bold text-dark mb-0">
-                    <i class="bi bi-award text-warning me-2"></i>Antigüedad del Personal
+    <!-- GRÁFICOS VISUALES -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="saas-card p-4 h-100">
+                <h5 class="fw-bold text-white mb-3">
+                    <i class="bi bi-calendar-range text-primary me-2"></i>Inscripciones de Socios por Mes
                 </h5>
-            </div>
-
-            @if (Model.EmpleadosPorAntiguedad != null && Model.EmpleadosPorAntiguedad.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-minimal mb-0">
-                        <thead>
-                            <tr>
-                                <th>Empleado</th>
-                                <th>Cargo</th>
-                                <th class="text-end">Antigüedad</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var emp in Model.EmpleadosPorAntiguedad)
-                            {
-                                <tr>
-                                    <td class="fw-semibold text-dark">@emp.NombreCompleto</td>
-                                    <td><span class="badge bg-light text-dark border">@emp.Cargo</span></td>
-                                    <td class="text-end fw-bold text-success">@emp.AntiguedadAños años (@emp.AntiguedadDias días)</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartInscripcionesHistoricas"></canvas>
                 </div>
-            }
-            else
-            {
-                <div class="p-4 text-muted small">No hay empleados registrados en plantilla.</div>
-            }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="saas-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-pie-chart-fill text-warning me-2"></i>Membresías por Categoría
+                    </h5>
+                    <div style="position: relative; height: 200px; width: 100%;">
+                        <canvas id="chartMembresiasPie"></canvas>
+                    </div>
+                </div>
+                <div class="text-center pt-3 border-top border-secondary">
+                    <small class="text-muted">Proporción de planes activos este mes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- CLIENTES POR MES -->
+        <div class="col-lg-6">
+            <div class="saas-card overflow-hidden h-100">
+                <div class="p-3 bg-dark border-bottom border-secondary">
+                    <h5 class="fw-bold text-white mb-0">
+                        <i class="bi bi-table text-primary me-2"></i>Inscripciones Históricas Registradas
+                    </h5>
+                </div>
+
+                @if (Model.ClientesPorMes != null && Model.ClientesPorMes.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-saas mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mes / Año</th>
+                                    <th class="text-end">Nuevas Inscripciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var mes in Model.ClientesPorMes)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold text-white">@mes.NombreMes</td>
+                                        <td class="text-end fw-bold text-success">+@mes.Cantidad cliente(s)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-muted small">No hay suficientes registros históricos en los últimos meses.</div>
+                }
+            </div>
+        </div>
+
+        <!-- EMPLEADOS POR ANTIGÜEDAD -->
+        <div class="col-lg-6">
+            <div class="saas-card overflow-hidden h-100">
+                <div class="p-3 bg-dark border-bottom border-secondary">
+                    <h5 class="fw-bold text-white mb-0">
+                        <i class="bi bi-award text-warning me-2"></i>Antigüedad del Personal en Plantilla
+                    </h5>
+                </div>
+
+                @if (Model.EmpleadosPorAntiguedad != null && Model.EmpleadosPorAntiguedad.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-saas mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Cargo</th>
+                                    <th class="text-end">Antigüedad acumulada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var emp in Model.EmpleadosPorAntiguedad)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold text-white">@emp.NombreCompleto</td>
+                                        <td>
+                                            <span class="badge bg-purple-subtle text-light border border-purple px-2 py-1" style="background: rgba(139, 61, 255, 0.2);">
+                                                @emp.Cargo
+                                            </span>
+                                        </td>
+                                        <td class="text-end fw-bold text-info">@emp.AntiguedadAños año(s) <span class="small text-muted">(@emp.AntiguedadDias días)</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-4 text-muted small">No hay empleados registrados en plantilla.</div>
+                }
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx1 = document.getElementById('chartInscripcionesHistoricas').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Socios Inscritos',
+                        data: [15, 22, 30, 28, 35, 42, 48],
+                        borderColor: '#8B3DFF',
+                        backgroundColor: 'rgba(139, 61, 255, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#C9C9C9' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#C9C9C9' } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('chartMembresiasPie').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pase Premium 24/7', 'Pase Estándar', 'Pase VIP'],
+                    datasets: [{
+                        data: [55, 30, 15],
+                        backgroundColor: ['#8B3DFF', '#3B82F6', '#22C55E'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff', font: { size: 11 } } } }
+                }
+            });
+        });
+    </script>
+}

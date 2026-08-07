@@ -5,142 +5,146 @@
 }
 
 <div class="container py-4">
+    <!-- CABECERA PRINCIPAL CON METRICAS EN VIVO -->
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
         <div>
-            <h2 class="fw-bold text-white mb-1">
-                <i class="bi bi-speedometer2 text-primary me-2"></i>Panel de Control Operativo
-            </h2>
-            <p class="text-secondary small mb-0">Resumen en tiempo real de socios, plantilla de personal e indicadores del gimnasio</p>
+            <span class="saas-badge saas-badge-purple mb-2">
+                <i class="bi bi-speedometer2 me-1"></i> PANEL ADMINISTRATIVO PRINCIPAL
+            </span>
+            <h2 class="fw-bold text-white mb-1">AURA FITNESS CLUB — Centro de Control</h2>
+            <p class="text-secondary small mb-0">Resumen ejecutivo en tiempo real de socios, operaciones de caja y plantilla</p>
         </div>
         <div class="d-flex gap-2">
-            <a asp-action="Estadisticas" class="btn btn-outline-purple">
-                <i class="bi bi-bar-chart me-1"></i> Ver Estadísticas
+            <a asp-action="Estadisticas" class="btn btn-outline-purple fw-bold">
+                <i class="bi bi-bar-chart me-1"></i> Reportes Analíticos
             </a>
-            <a asp-controller="Cliente" asp-action="Create" class="btn btn-purple">
-                <i class="bi bi-person-plus me-1"></i> Nuevo Cliente
+            <a asp-controller="Cliente" asp-action="Create" class="btn btn-purple fw-bold">
+                <i class="bi bi-person-plus-fill me-1"></i> Nuevo Socio
             </a>
         </div>
     </div>
 
-    <!-- METRIC STAT CARDS -->
+    <!-- METRIC STAT CARDS PRINCIPALES (4 COLUMNAS) -->
     <div class="row g-4 mb-4">
         <div class="col-lg-3 col-sm-6">
-            <div class="saas-card p-4 h-100">
+            <div class="saas-card p-4 h-100 position-relative overflow-hidden" style="border-left: 4px solid var(--primary);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="text-muted small fw-bold text-uppercase">Total Clientes</span>
-                    <div class="brand-badge-purple" style="width: 40px; height: 40px;">
+                    <span class="text-muted small fw-bold text-uppercase">Total Socios Registrados</span>
+                    <div class="brand-badge-purple" style="width: 42px; height: 42px;">
                         <i class="bi bi-people-fill"></i>
                     </div>
                 </div>
                 <h2 class="display-6 fw-bold text-white mb-1">@Model.TotalClientes</h2>
                 <span class="saas-badge saas-badge-success">
-                    <i class="bi bi-check-circle-fill"></i> Alumnos Activos
+                    <i class="bi bi-check-circle-fill me-1"></i> Padrón Activo
                 </span>
             </div>
         </div>
 
         <div class="col-lg-3 col-sm-6">
-            <div class="saas-card p-4 h-100">
+            <div class="saas-card p-4 h-100 position-relative overflow-hidden" style="border-left: 4px solid var(--color-info);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="text-muted small fw-bold text-uppercase">Total Empleados</span>
-                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-info);">
+                    <span class="text-muted small fw-bold text-uppercase">Personal en Plantilla</span>
+                    <div class="brand-badge-purple" style="width: 42px; height: 42px; background-color: var(--color-info);">
                         <i class="bi bi-person-workspace"></i>
                     </div>
                 </div>
                 <h2 class="display-6 fw-bold text-white mb-1">@Model.TotalEmpleados</h2>
                 <span class="saas-badge saas-badge-purple">
-                    Plantilla Activa
+                    Equipos & Coaches
                 </span>
             </div>
         </div>
 
         <div class="col-lg-3 col-sm-6">
-            <div class="saas-card p-4 h-100">
+            <div class="saas-card p-4 h-100 position-relative overflow-hidden" style="border-left: 4px solid var(--color-success);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="text-muted small fw-bold text-uppercase">Altas Recientes</span>
-                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-success);">
+                    <span class="text-muted small fw-bold text-uppercase">Nuevas Altas (7 días)</span>
+                    <div class="brand-badge-purple" style="width: 42px; height: 42px; background-color: var(--color-success);">
                         <i class="bi bi-person-check-fill"></i>
                     </div>
                 </div>
                 <h2 class="display-6 fw-bold text-white mb-1">@Model.ClientesRecientes</h2>
-                <span class="text-muted small">Últimos 7 días</span>
+                <span class="text-success small fw-semibold"><i class="bi bi-arrow-up-right me-1"></i>Crecimiento activo</span>
             </div>
         </div>
 
         <div class="col-lg-3 col-sm-6">
-            <div class="saas-card p-4 h-100">
+            <div class="saas-card p-4 h-100 position-relative overflow-hidden" style="border-left: 4px solid var(--color-warning);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span class="text-muted small fw-bold text-uppercase">Clientes Inactivos</span>
-                    <div class="brand-badge-purple" style="width: 40px; height: 40px; background-color: var(--color-warning);">
+                    <span class="text-muted small fw-bold text-uppercase">Socios Inactivos / Bajas</span>
+                    <div class="brand-badge-purple" style="width: 42px; height: 42px; background-color: var(--color-warning);">
                         <i class="bi bi-person-x-fill"></i>
                     </div>
                 </div>
                 <h2 class="display-6 fw-bold text-white mb-1">@Model.ClientesInactivos</h2>
-                <span class="saas-badge saas-badge-danger">Bajas temporales</span>
+                <span class="saas-badge saas-badge-danger">Requiere Re-activación</span>
             </div>
         </div>
     </div>
 
-    <!-- ACCESOS RÁPIDOS Y RESUMEN DE EMPLEADOS POR CARGO -->
-    <div class="row g-4">
-        <div class="col-lg-6">
+    <!-- SECCIÓN INTERACTIVA DE GRÁFICOS Y ACCESOS RÁPIDOS -->
+    <div class="row g-4 mb-4">
+        <!-- GRÁFICO OPERATIVO DE CONCURRENCIA E INGRESOS -->
+        <div class="col-lg-8">
             <div class="saas-card p-4 h-100">
-                <h5 class="fw-bold text-white mb-3">
-                    <i class="bi bi-diagram-3 text-primary me-2"></i>Distribución de Personal por Cargo
-                </h5>
-
-                @if (Model.EmpleadosPorCargo != null && Model.EmpleadosPorCargo.Any())
-                {
-                    <div class="d-flex flex-column gap-3">
-                        @foreach (var cargo in Model.EmpleadosPorCargo)
-                        {
-                            <div>
-                                <div class="d-flex justify-content-between text-secondary small fw-semibold mb-1">
-                                    <span>@cargo.Cargo</span>
-                                    <span class="text-white">@cargo.Cantidad empleado(s)</span>
-                                </div>
-                                <div class="progress bg-dark" style="height: 8px;">
-                                    <div class="progress-bar" style="width: @(cargo.Cantidad * 33)%; background-color: var(--primary);"></div>
-                                </div>
-                            </div>
-                        }
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h4 class="fw-bold text-white mb-1">
+                            <i class="bi bi-bar-chart-line text-primary me-2"></i>Concurrencia e Ingresos Mensuales
+                        </h4>
+                        <p class="text-secondary small mb-0">Evolución estimada de accesos por molinete e ingresos en caja</p>
                     </div>
-                }
-                else
-                {
-                    <p class="text-muted small">No hay empleados registrados en plantilla.</p>
-                }
+                    <span class="badge bg-secondary-subtle text-light border border-secondary px-3 py-2">Año 2026</span>
+                </div>
+
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="chartDashboardAdmin"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="saas-card p-4 h-100">
-                <h5 class="fw-bold text-white mb-3">
-                    <i class="bi bi-lightning-charge text-warning me-2"></i>Acciones Rápidas
-                </h5>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <a asp-controller="Cliente" asp-action="Index" class="saas-card p-3 d-block text-decoration-none text-white text-center">
-                            <i class="bi bi-people fs-2 text-primary d-block mb-1"></i>
-                            <span class="small fw-semibold">Ver Clientes</span>
+        <!-- DISTRIBUCIÓN DE PERSONAL Y ACCIONES RÁPIDAS -->
+        <div class="col-lg-4">
+            <div class="saas-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 class="fw-bold text-white mb-3">
+                        <i class="bi bi-diagram-3 text-primary me-2"></i>Personal por Área
+                    </h5>
+
+                    @if (Model.EmpleadosPorCargo != null && Model.EmpleadosPorCargo.Any())
+                    {
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            @foreach (var cargo in Model.EmpleadosPorCargo)
+                            {
+                                <div>
+                                    <div class="d-flex justify-content-between text-secondary small fw-semibold mb-1">
+                                        <span>@cargo.Cargo</span>
+                                        <span class="text-white fw-bold">@cargo.Cantidad empleado(s)</span>
+                                    </div>
+                                    <div class="progress bg-dark" style="height: 8px;">
+                                        <div class="progress-bar bg-purple" style="width: @(cargo.Cantidad * 33)%;"></div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted small">No hay empleados registrados en plantilla.</p>
+                    }
+                </div>
+
+                <div>
+                    <h6 class="fw-bold text-white mb-2">Terminales & Accesos por Rol</h6>
+                    <div class="d-grid gap-2">
+                        <a asp-action="RecepcionPanel" class="btn btn-secondary-saas text-start d-flex align-items-center justify-content-between py-2">
+                            <span><i class="bi bi-display me-2 text-info"></i> Terminal de Recepción & Check-in</span>
+                            <i class="bi bi-arrow-right"></i>
                         </a>
-                    </div>
-                    <div class="col-6">
-                        <a asp-controller="Empleado" asp-action="Index" class="saas-card p-3 d-block text-decoration-none text-white text-center">
-                            <i class="bi bi-person-badge fs-2 text-info d-block mb-1"></i>
-                            <span class="small fw-semibold">Ver Empleados</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a asp-controller="Cliente" asp-action="Create" class="saas-card p-3 d-block text-decoration-none text-white text-center">
-                            <i class="bi bi-person-plus fs-2 text-success d-block mb-1"></i>
-                            <span class="small fw-semibold">Nuevo Cliente</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a asp-action="Estadisticas" class="saas-card p-3 d-block text-decoration-none text-white text-center">
-                            <i class="bi bi-bar-chart fs-2 text-warning d-block mb-1"></i>
-                            <span class="small fw-semibold">Estadísticas</span>
+                        <a asp-action="InstructorPanel" class="btn btn-secondary-saas text-start d-flex align-items-center justify-content-between py-2">
+                            <span><i class="bi bi-activity me-2 text-success"></i> Panel de Instructores & Rutinas</span>
+                            <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -148,3 +152,51 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ctx = document.getElementById('chartDashboardAdmin').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Asistencias Totales',
+                            data: [420, 480, 560, 610, 590, 680, 720],
+                            backgroundColor: 'rgba(139, 61, 255, 0.75)',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Cuotas Cobradas ($k)',
+                            data: [350, 410, 490, 520, 510, 600, 640],
+                            backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff', font: { family: 'Plus Jakarta Sans', size: 12 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#C9C9C9' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#C9C9C9' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

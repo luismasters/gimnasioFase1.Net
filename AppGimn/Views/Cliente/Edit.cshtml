@@ -1,129 +1,130 @@
 @model AppGimn.Models.Cliente
 
 @{
-    ViewData["Title"] = "Editar Cliente - AppGimn";
+    ViewData["Title"] = "Editar Cliente - AppGimn Premium";
 }
 
-<div class="row justify-content-center py-3">
-    <div class="col-lg-8">
-        <div class="saas-card p-4 p-md-5">
-            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
-                <div>
-                    <h3 class="fw-bold text-white mb-1">
-                        <i class="bi bi-pencil-square text-primary me-2"></i>Editar Cliente: @Model.NombreCompleto
-                    </h3>
-                    <p class="text-secondary small mb-0">Actualiza la información personal, ficha médica o estado del cliente</p>
+<div class="recepcion-layout">
+    <partial name="_RecepcionSidebar" />
+
+    <div class="recepcion-content container-fluid px-lg-4 py-4 pb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="saas-card p-4 p-md-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
+                        <div>
+                            <h3 class="fw-bold text-white mb-1">
+                                <i class="bi bi-pencil-square text-primary me-2"></i>Editar Socio: @Model.NombreCompleto
+                            </h3>
+                            <p class="text-secondary small mb-0">Actualiza la información personal, foto de perfil o estado de la membresía</p>
+                        </div>
+                        <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i> Volver al Padrón
+                        </a>
+                    </div>
+
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label asp-for="FotoUrl" class="form-label fw-bold text-white mb-2">Foto de Perfil</label>
+                                <div class="text-center p-3 saas-card" style="background-color: var(--bg-surface-variant);">
+                                    <div id="fotoPreview"
+                                         class="rounded-circle border border-secondary bg-dark mx-auto mb-3 d-flex align-items-center justify-content-center overflow-hidden"
+                                         style="width: 120px; height: 120px;">
+                                        @if (!string.IsNullOrEmpty(Model.FotoUrl))
+                                        {
+                                            <img src="@Model.FotoUrl" class="w-100 h-100 object-fit-cover" alt="Foto actual" />
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-person-fill text-muted" style="font-size: 3.5rem;"></i>
+                                        }
+                                    </div>
+                                    <input type="file" name="Foto" id="Foto" accept="image/*"
+                                           class="form-control form-control-sm bg-dark text-white border-secondary mb-1" />
+                                    <small class="text-muted d-block">Formato JPG, PNG o WebP (máx. 5 MB)</small>
+                                    <span asp-validation-for="FotoUrl" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="Nombre" class="form-label fw-semibold text-white"></label>
+                                        <input asp-for="Nombre" class="form-control" />
+                                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="Apellido" class="form-label fw-semibold text-white"></label>
+                                        <input asp-for="Apellido" class="form-control" />
+                                        <span asp-validation-for="Apellido" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="DNI" class="form-label fw-semibold text-white"></label>
+                                        <input asp-for="DNI" class="form-control" />
+                                        <span asp-validation-for="DNI" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="FechaNacimiento" class="form-label fw-semibold text-white"></label>
+                                        <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Telefono" class="form-label fw-semibold text-white"></label>
+                                <input asp-for="Telefono" class="form-control" placeholder="+54 11 4455-6677" />
+                                <span asp-validation-for="Telefono" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-semibold text-white"></label>
+                                <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FechaInscripcion" class="form-label fw-semibold text-white"></label>
+                                <input asp-for="FechaInscripcion" class="form-control" type="date" />
+                                <span asp-validation-for="FechaInscripcion" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ContactoEmergencia" class="form-label fw-semibold text-white"></label>
+                                <input asp-for="ContactoEmergencia" class="form-control" placeholder="Nombre y teléfono de familiar" />
+                                <span asp-validation-for="ContactoEmergencia" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ObservacionesMedicas" class="form-label fw-semibold text-white"></label>
+                            <textarea asp-for="ObservacionesMedicas" class="form-control" rows="3" placeholder="Apto médico, lesiones previas, alergias u observaciones..."></textarea>
+                            <span asp-validation-for="ObservacionesMedicas" class="text-danger small"></span>
+                        </div>
+
+                        <div class="saas-card p-3 mb-4" style="background-color: var(--bg-surface-variant);">
+                            <div class="form-check">
+                                <input asp-for="EstaActivo" class="form-check-input" />
+                                <label asp-for="EstaActivo" class="form-check-label text-white fw-medium">
+                                    Socio Activo (Habilita el ingreso por molinete y reserva de clases)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-purple btn-lg px-4 fw-bold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Guardar Cambios
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary-saas btn-lg px-4">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
                 </div>
-                <a asp-action="Index" class="btn btn-secondary-saas btn-sm">
-                    <i class="bi bi-arrow-left me-1"></i> Volver al Listado
-                </a>
             </div>
-
-            <form asp-action="Edit" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
-                <input type="hidden" asp-for="Id" />
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <label asp-for="FotoUrl" class="form-label">Foto del Cliente</label>
-                        <div class="text-center">
-                            <div id="fotoPreview"
-                                 class="rounded-circle border border-secondary bg-secondary-subtle mx-auto mb-2 d-flex align-items-center justify-content-center"
-                                 style="width: 96px; height: 96px; overflow: hidden;">
-                                @if (!string.IsNullOrEmpty(Model.FotoUrl))
-                                {
-                                    <img src="@Model.FotoUrl" class="w-100 h-100 object-fit-cover" alt="Foto actual" />
-                                }
-                                else
-                                {
-                                    <i class="bi bi-person-fill text-muted" style="font-size: 2.5rem;"></i>
-                                }
-                            </div>
-                            <input type="file" name="Foto" id="Foto" accept="image/*"
-                                   class="form-control form-control-sm bg-dark text-white" />
-                            <small class="text-muted d-block mt-1">Dejar vacío para conservar la foto actual</small>
-                            <span asp-validation-for="FotoUrl" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label asp-for="Nombre" class="form-label"></label>
-                                <input asp-for="Nombre" class="form-control" />
-                                <span asp-validation-for="Nombre" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="Apellido" class="form-label"></label>
-                                <input asp-for="Apellido" class="form-control" />
-                                <span asp-validation-for="Apellido" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mt-0">
-                            <div class="col-md-6">
-                                <label asp-for="DNI" class="form-label"></label>
-                                <input asp-for="DNI" class="form-control" />
-                                <span asp-validation-for="DNI" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="FechaNacimiento" class="form-label"></label>
-                                <input asp-for="FechaNacimiento" class="form-control" type="date" />
-                                <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Telefono" class="form-label"></label>
-                        <input asp-for="Telefono" class="form-control" />
-                        <span asp-validation-for="Telefono" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="FechaInscripcion" class="form-label"></label>
-                        <input asp-for="FechaInscripcion" class="form-control" type="date" />
-                        <span asp-validation-for="FechaInscripcion" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="ContactoEmergencia" class="form-label"></label>
-                        <input asp-for="ContactoEmergencia" class="form-control" />
-                        <span asp-validation-for="ContactoEmergencia" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="ObservacionesMedicas" class="form-label"></label>
-                    <textarea asp-for="ObservacionesMedicas" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="ObservacionesMedicas" class="text-danger small"></span>
-                </div>
-
-                <div class="saas-card p-3 mb-4" style="background-color: var(--bg-surface-variant);">
-                    <div class="form-check">
-                        <input asp-for="EstaActivo" class="form-check-input bg-dark border-secondary" />
-                        <label asp-for="EstaActivo" class="form-check-label text-white small">
-                            Cliente Activo (Permite acceso y reservas en el gimnasio)
-                        </label>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-purple btn-lg px-4">
-                        <i class="bi bi-check-circle-fill me-1"></i> Actualizar Cliente
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary-saas btn-lg px-4">
-                        Cancelar
-                    </a>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -141,7 +142,6 @@
             reader.readAsDataURL(file);
         });
 
-        // Evita el envío duplicado por doble clic en "Actualizar Cliente"
         document.querySelector('form[asp-action="Edit"]')?.addEventListener('submit', function() {
             const btn = this.querySelector('button[type="submit"]');
             if (btn) {
