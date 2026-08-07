@@ -12,11 +12,59 @@ namespace AppGimn.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Usuario> _userManager;
+        private readonly IWebHostEnvironment _env;
 
-        public ClienteController(ApplicationDbContext context, UserManager<Usuario> userManager)
+        public ClienteController(ApplicationDbContext context, UserManager<Usuario> userManager, IWebHostEnvironment env)
         {
             _context = context;
             _userManager = userManager;
+            _env = env;
+        }
+
+        // ✅ GUARDAR FOTO SUBIDA DEL CLIENTE EN WWWROOT/UPLOADS/FOTOS
+        private async Task<string?> GuardarFoto(IFormFile? foto)
+        {
+            if (foto == null || foto.Length == 0) return null;
+
+            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp" };
+            var extension = Path.GetExtension(foto.FileName).ToLowerInvariant();
+
+            if (!extensionesPermitidas.Contains(extension))
+            {
+                ModelState.AddModelError("Foto", "El archivo debe ser una imagen (JPG, PNG, WebP, GIF o BMP).");
+                return null;
+            }
+
+            if (foto.Length > 5 * 1024 * 1024)
+            {
+                ModelState.AddModelError("Foto", "La imagen no puede superar los 5 MB.");
+                return null;
+            }
+
+            var carpetaUploads = Path.Combine(_env.WebRootPath, "uploads", "fotos");
+            Directory.CreateDirectory(carpetaUploads);
+
+            var nombreArchivo = $"cliente_{Guid.NewGuid():N}{extension}";
+            var rutaCompleta = Path.Combine(carpetaUploads, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                await foto.CopyToAsync(stream);
+            }
+
+            return $"/uploads/fotos/{nombreArchivo}";
+        }
+
+        // ✅ ELIMINAR FOTO ANTERIOR DEL DISCO
+        private void EliminarFoto(string? fotoUrl)
+        {
+            if (string.IsNullOrWhiteSpace(fotoUrl) || !fotoUrl.StartsWith("/uploads/fotos/")) return;
+
+            var rutaCompleta = Path.Combine(_env.WebRootPath, fotoUrl.TrimStart('/'));
+            if (System.IO.File.Exists(rutaCompleta))
+            {
+                System.IO.File.Delete(rutaCompleta);
+            }
         }
 
         // ✅ MÉTODO PARA VERIFICAR PERMISOS
@@ -71,6 +119,25 @@ namespace AppGimn.Controllers
                 .ThenBy(c => c.Nombre)
                 .ToListAsync();
 
+            // Datos de suscripción (último pago) para mostrar plan y estado de la cuota
+            var clienteIds = clientes.Select(c => c.Id).ToList();
+            var ultimosPagos = await _context.Pagos
+                .Where(p => clienteIds.Contains(p.ClienteId))
+                .Include(p => p.Membresia)
+                .GroupBy(p => p.ClienteId)
+                .Select(g => g.OrderByDescending(p => p.FechaPago).FirstOrDefault())
+                .ToListAsync();
+
+            var planDict = new Dictionary<int, string>();
+            var estadoDict = new Dictionary<int, bool>();
+            foreach (var p in ultimosPagos.Where(p => p != null))
+            {
+                planDict[p!.ClienteId] = p.Membresia?.Nombre ?? "Sin plan";
+                estadoDict[p!.ClienteId] = p.FechaVencimiento >= DateTime.Now.Date;
+            }
+            ViewBag.PlanDict = planDict;
+            ViewBag.EstadoSuscripcionDict = estadoDict;
+
             return View(clientes);
         }
 
@@ -108,7 +175,7 @@ namespace AppGimn.Controllers
         // ✅ CREATE POST - Procesar formulario
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo,FotoUrl")] Cliente cliente, IFormFile? Foto)
         {
             if (!await PuedeGestionarClientes())
             {
@@ -125,6 +192,13 @@ namespace AppGimn.Controllers
                 if (existeCliente)
                 {
                     ModelState.AddModelError("DNI", "Ya existe un cliente con este DNI.");
+                    return View(cliente);
+                }
+
+                cliente.FotoUrl = await GuardarFoto(Foto);
+
+                if (!ModelState.IsValid)
+                {
                     return View(cliente);
                 }
 
@@ -157,7 +231,7 @@ namespace AppGimn.Controllers
         // ✅ EDIT POST - Procesar edición
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DNI,Nombre,Apellido,Email,Telefono,FechaNacimiento,FechaInscripcion,ContactoEmergencia,ObservacionesMedicas,EstaActivo,FotoUrl")] Cliente cliente, IFormFile? Foto)
         {
             if (!await PuedeGestionarClientes())
             {
@@ -179,6 +253,23 @@ namespace AppGimn.Controllers
                     {
                         ModelState.AddModelError("DNI", "Ya existe un cliente con este DNI.");
                         return View(cliente);
+                    }
+
+                    var clienteAnterior = await _context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cliente.Id);
+
+                    if (Foto != null && Foto.Length > 0)
+                    {
+                        EliminarFoto(clienteAnterior?.FotoUrl);
+                        cliente.FotoUrl = await GuardarFoto(Foto);
+                        if (!ModelState.IsValid)
+                        {
+                            return View(cliente);
+                        }
+                    }
+                    else
+                    {
+                        // Conservar la foto existente si no se subió una nueva
+                        cliente.FotoUrl = clienteAnterior?.FotoUrl;
                     }
 
                     _context.Update(cliente);
@@ -231,6 +322,7 @@ namespace AppGimn.Controllers
             var cliente = await _context.Clientes.FindAsync(id);
             if (cliente != null)
             {
+                EliminarFoto(cliente.FotoUrl);
                 _context.Clientes.Remove(cliente);
                 await _context.SaveChangesAsync();
                 TempData["MensajeExito"] = "Cliente eliminado exitosamente.";

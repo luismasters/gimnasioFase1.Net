@@ -1,0 +1,19 @@
+@model AppGimn.Models.Cliente
+@{
+    var size = (int)(ViewBag.AvatarSize ?? 40);
+    var extraClass = ViewBag.AvatarClass?.ToString() ?? "";
+}
+@if (!string.IsNullOrEmpty(Model?.FotoUrl))
+{
+    <img src="@Model.FotoUrl" class="rounded-circle object-fit-cover border border-secondary @extraClass"
+         style="width: @(size)px; height: @(size)px;"
+         alt="Foto de @Model.NombreCompleto" title="@Model.NombreCompleto" />
+}
+else
+{
+    <span class="rounded-circle bg-secondary-subtle text-white d-inline-flex align-items-center justify-content-center flex-shrink-0 @extraClass"
+          style="width: @(size)px; height: @(size)px; font-size: @((size * 0.5).ToString("0"))px;"
+          title="@Model?.NombreCompleto">
+        <i class="bi bi-person-fill"></i>
+    </span>
+}

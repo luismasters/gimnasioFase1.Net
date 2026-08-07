@@ -88,6 +88,10 @@ namespace AppGimn.Migrations
                     b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FotoUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -102,6 +106,11 @@ namespace AppGimn.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DNI")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Clientes_DNI")
+                        .HasFilter("[DNI] IS NOT NULL AND [DNI] <> ''");
 
                     b.ToTable("Clientes");
                 });
@@ -200,6 +209,11 @@ namespace AppGimn.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DNI")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Empleados_DNI")
+                        .HasFilter("[DNI] IS NOT NULL AND [DNI] <> ''");
 
                     b.ToTable("Empleados");
                 });

@@ -15,7 +15,11 @@
                 <p class="text-secondary small">¿Estás seguro de que deseas eliminar este cliente del sistema?</p>
             </div>
 
-            <div class="saas-card p-4 mb-4" style="background-color: var(--bg-surface-variant);">
+            <div class="saas-card p-4 mb-4 text-center" style="background-color: var(--bg-surface-variant);">
+                <div class="mb-3">
+                    @{ ViewBag.AvatarSize = 96; }
+                    <partial name="_ClienteAvatar" model="Model" />
+                </div>
                 <div class="h5 fw-bold text-white mb-2">@Model.NombreCompleto</div>
                 <div class="small text-secondary mb-1"><strong>DNI:</strong> <code>@Model.DNI</code></div>
                 <div class="small text-secondary mb-1"><strong>Email:</strong> @(Model.Email ?? "-")</div>

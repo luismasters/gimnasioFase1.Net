@@ -19,33 +19,58 @@
                 </a>
             </div>
 
-            <form asp-action="Edit">
+            <form asp-action="Edit" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
                 <input type="hidden" asp-for="Id" />
 
                 <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" />
-                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    <div class="col-md-4">
+                        <label asp-for="FotoUrl" class="form-label">Foto del Cliente</label>
+                        <div class="text-center">
+                            <div id="fotoPreview"
+                                 class="rounded-circle border border-secondary bg-secondary-subtle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                                 style="width: 96px; height: 96px; overflow: hidden;">
+                                @if (!string.IsNullOrEmpty(Model.FotoUrl))
+                                {
+                                    <img src="@Model.FotoUrl" class="w-100 h-100 object-fit-cover" alt="Foto actual" />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person-fill text-muted" style="font-size: 2.5rem;"></i>
+                                }
+                            </div>
+                            <input type="file" name="Foto" id="Foto" accept="image/*"
+                                   class="form-control form-control-sm bg-dark text-white" />
+                            <small class="text-muted d-block mt-1">Dejar vacío para conservar la foto actual</small>
+                            <span asp-validation-for="FotoUrl" class="text-danger small"></span>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="Apellido" class="form-label"></label>
-                        <input asp-for="Apellido" class="form-control" />
-                        <span asp-validation-for="Apellido" class="text-danger small"></span>
-                    </div>
-                </div>
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Nombre" class="form-label"></label>
+                                <input asp-for="Nombre" class="form-control" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Apellido" class="form-label"></label>
+                                <input asp-for="Apellido" class="form-control" />
+                                <span asp-validation-for="Apellido" class="text-danger small"></span>
+                            </div>
+                        </div>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="DNI" class="form-label"></label>
-                        <input asp-for="DNI" class="form-control" />
-                        <span asp-validation-for="DNI" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="FechaNacimiento" class="form-label"></label>
-                        <input asp-for="FechaNacimiento" class="form-control" type="date" />
-                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                        <div class="row g-3 mt-0">
+                            <div class="col-md-6">
+                                <label asp-for="DNI" class="form-label"></label>
+                                <input asp-for="DNI" class="form-control" />
+                                <span asp-validation-for="DNI" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FechaNacimiento" class="form-label"></label>
+                                <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                                <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -104,5 +129,26 @@
 </div>
 
 @section Scripts {
+    <script>
+        document.getElementById('Foto')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('fotoPreview');
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.innerHTML = '<img src="' + ev.target.result + '" class="w-100 h-100 object-fit-cover" alt="Vista previa" />';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Evita el envío duplicado por doble clic en "Actualizar Cliente"
+        document.querySelector('form[asp-action="Edit"]')?.addEventListener('submit', function() {
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Guardando...';
+            }
+        });
+    </script>
     <partial name="_ValidationScriptsPartial" />
 }

@@ -4,7 +4,11 @@
     ViewData["Title"] = "Registrar Nuevo Cliente - AppGimn";
 }
 
-<div class="row justify-content-center py-3">
+<div class="recepcion-layout">
+    <partial name="_RecepcionSidebar" />
+
+    <div class="recepcion-content container-fluid px-lg-4 py-4 pb-5">
+    <div class="row justify-content-center py-3">
     <div class="col-lg-8">
         <div class="saas-card p-4 p-md-5">
             <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary opacity-75">
@@ -19,32 +23,50 @@
                 </a>
             </div>
 
-            <form asp-action="Create">
+            <form asp-action="Create" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                 <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="Nombre" class="form-label"></label>
-                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Carlos" />
-                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    <div class="col-md-4">
+                        <label asp-for="FotoUrl" class="form-label">Foto del Cliente</label>
+                        <div class="text-center">
+                            <div id="fotoPreview"
+                                 class="rounded-circle border border-secondary bg-secondary-subtle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                                 style="width: 96px; height: 96px; overflow: hidden;">
+                                <i class="bi bi-person-fill text-muted" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <input type="file" name="Foto" id="Foto" accept="image/*"
+                                   class="form-control form-control-sm bg-dark text-white" />
+                            <small class="text-muted d-block mt-1">JPG, PNG o WebP (máx. 5 MB)</small>
+                            <span asp-validation-for="FotoUrl" class="text-danger small"></span>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <label asp-for="Apellido" class="form-label"></label>
-                        <input asp-for="Apellido" class="form-control" placeholder="Ej. Gómez" />
-                        <span asp-validation-for="Apellido" class="text-danger small"></span>
-                    </div>
-                </div>
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Nombre" class="form-label"></label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ej. Carlos" />
+                                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Apellido" class="form-label"></label>
+                                <input asp-for="Apellido" class="form-control" placeholder="Ej. Gómez" />
+                                <span asp-validation-for="Apellido" class="text-danger small"></span>
+                            </div>
+                        </div>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label asp-for="DNI" class="form-label"></label>
-                        <input asp-for="DNI" class="form-control" placeholder="12345678" />
-                        <span asp-validation-for="DNI" class="text-danger small"></span>
-                    </div>
-                    <div class="col-md-6">
-                        <label asp-for="FechaNacimiento" class="form-label"></label>
-                        <input asp-for="FechaNacimiento" class="form-control" type="date" />
-                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                        <div class="row g-3 mt-0">
+                            <div class="col-md-6">
+                                <label asp-for="DNI" class="form-label"></label>
+                                <input asp-for="DNI" class="form-control" placeholder="12345678" />
+                                <span asp-validation-for="DNI" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FechaNacimiento" class="form-label"></label>
+                                <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                                <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -100,8 +122,31 @@
             </form>
         </div>
     </div>
+    </div>
+    </div>
 </div>
 
 @section Scripts {
+    <script>
+        document.getElementById('Foto')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('fotoPreview');
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.innerHTML = '<img src="' + ev.target.result + '" class="w-100 h-100 object-fit-cover" alt="Vista previa" />';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Evita el envío duplicado por doble clic en "Guardar Cliente"
+        document.querySelector('form[asp-action="Create"]')?.addEventListener('submit', function() {
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Guardando...';
+            }
+        });
+    </script>
     <partial name="_ValidationScriptsPartial" />
 }

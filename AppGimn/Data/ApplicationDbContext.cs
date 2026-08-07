@@ -11,6 +11,25 @@ namespace AppGimn.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // ============ RESTRICCIONES DE UNICIDAD ============
+            // Evita clientes y empleados duplicados por DNI a nivel de base de datos.
+            modelBuilder.Entity<Cliente>()
+                .HasIndex(c => c.DNI)
+                .IsUnique()
+                .HasFilter("[DNI] IS NOT NULL AND [DNI] <> ''")
+                .HasDatabaseName("IX_Clientes_DNI");
+
+            modelBuilder.Entity<Empleado>()
+                .HasIndex(e => e.DNI)
+                .IsUnique()
+                .HasFilter("[DNI] IS NOT NULL AND [DNI] <> ''")
+                .HasDatabaseName("IX_Empleados_DNI");
+        }
+
         // ============ TABLAS DE NEGOCIO ============
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Empleado> Empleados { get; set; }

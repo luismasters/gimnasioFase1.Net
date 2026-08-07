@@ -62,8 +62,15 @@
                         <span class="text-muted small fw-bold text-uppercase">Carnet Digital de Socio</span>
                         <span class="saas-badge saas-badge-purple">VIP ACCESS</span>
                     </div>
-                    <div class="rounded-circle bg-primary text-white mx-auto d-flex align-items-center justify-content-center fw-bold fs-2 mb-3 shadow" style="width: 80px; height: 80px; border: 3px solid var(--primary-light);">
-                        CG
+                    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow" style="width: 80px; height: 80px; border: 3px solid var(--primary-light); overflow: hidden; background-color: var(--bg-surface-variant);">
+                        @if (!string.IsNullOrEmpty(ViewBag.ClienteFoto as string))
+                        {
+                            <img src="@ViewBag.ClienteFoto" class="w-100 h-100 object-fit-cover" alt="@ViewBag.ClienteNombre" />
+                        }
+                        else
+                        {
+                            <span class="fw-bold fs-2 text-white">CG</span>
+                        }
                     </div>
                     <h4 class="fw-bold text-white mb-1">@ViewBag.ClienteNombre</h4>
                     <p class="text-secondary small mb-3">DNI: <code>11223344</code> | ID Socio: #AURA-9842</p>

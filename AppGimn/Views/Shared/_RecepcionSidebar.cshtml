@@ -1,0 +1,51 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<aside class="recepcion-sidebar d-flex flex-column">
+    <!-- Encabezado del módulo de recepción -->
+    <div class="recip-sidebar-brand d-flex align-items-center gap-2 px-3 py-3 border-bottom border-secondary">
+        <div class="brand-badge-purple" style="background-color: var(--color-info); width: 38px; height: 38px; font-size: 1.1rem;">
+            <i class="bi bi-display"></i>
+        </div>
+        <div>
+            <div class="fw-bold text-white lh-1">AURA FITNESS CLUB</div>
+            <small class="text-muted">Recepción & Mostrador</small>
+        </div>
+    </div>
+
+    <nav class="flex-grow-1 p-2 d-flex flex-column gap-1">
+        <span class="sidebar-caption px-3 pt-3 pb-1">TERMINAL</span>
+        <a asp-controller="Dashboard" asp-action="RecepcionPanel" class="sidebar-link @(action == "RecepcionPanel" ? "active" : "")">
+            <i class="bi bi-qr-code-scan me-2"></i> Terminal Check-in
+        </a>
+
+        <span class="sidebar-caption px-3 pt-3 pb-1" style="margin-top:.5rem;">CAJA & SOCIOS</span>
+        <a asp-controller="Dashboard" asp-action="RecepcionCobros" class="sidebar-link @(action == "RecepcionCobros" ? "active" : "")">
+            <i class="bi bi-cash-coin me-2"></i> Cobros & Caja
+        </a>
+        <a asp-controller="Cliente" asp-action="Index" class="sidebar-link @(controller == "Cliente" && action == "Index" ? "active" : "")">
+            <i class="bi bi-people me-2"></i> Padrón de Socios
+        </a>
+        <a asp-controller="Cliente" asp-action="Create" class="sidebar-link @(controller == "Cliente" ? "active" : "")">
+            <i class="bi bi-person-plus me-2"></i> Registrar Socio
+        </a>
+    </nav>
+
+    <!-- Estado del operador al pie del sidebar -->
+    <div class="border-top p-3">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="brand-badge-purple" style="width: 34px; height: 34px; font-size: .95rem;">
+                <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="lh-sm">
+                <div class="fw-bold text-white small">Ana Martínez</div>
+                <small class="text-muted">Turno Mañana</small>
+            </div>
+        </div>
+        <span class="saas-badge text-white w-100 justify-content-center" style="background-color: rgba(34,197,94,.15); color: var(--color-success); border: 1px solid rgba(34,197,94,.3);">
+            <i class="bi bi-wifi me-1"></i> MOLINETE ONLINE
+        </span>
+    </div>
+</aside>

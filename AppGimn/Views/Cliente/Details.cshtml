@@ -25,6 +25,21 @@
             </div>
 
             <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="saas-card p-4 text-center" style="background-color: var(--bg-surface-variant);">
+                        <div class="mx-auto mb-3">
+                            @{ ViewBag.AvatarSize = 140; }
+                            <partial name="_ClienteAvatar" model="Model" />
+                        </div>
+                        <h4 class="fw-bold text-white mb-0">@Model.NombreCompleto</h4>
+                        <span class="saas-badge @(Model.EstaActivo ? "saas-badge-success" : "saas-badge-danger") mt-2">
+                            @(Model.EstaActivo ? "Cliente Activo" : "Cliente Inactivo")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                <div class="row g-4">
                 <div class="col-md-6">
                     <div class="saas-card p-3" style="background-color: var(--bg-surface-variant);">
                         <span class="text-muted small fw-bold text-uppercase d-block mb-1">DNI</span>
@@ -74,6 +89,8 @@
                             @(string.IsNullOrWhiteSpace(Model.ObservacionesMedicas) ? "Sin observaciones médicas registradas." : Model.ObservacionesMedicas)
                         </p>
                     </div>
+                </div>
+                </div>
                 </div>
             </div>
         </div>

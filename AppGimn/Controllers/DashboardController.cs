@@ -76,6 +76,7 @@ namespace AppGimn.Controllers
             }
 
             ViewBag.ClienteNombre = cliente != null ? cliente.NombreCompleto : "Carlos Gómez";
+            ViewBag.ClienteFoto = cliente != null ? cliente.FotoUrl : null;
             ViewBag.MiembroDesde = cliente != null ? cliente.FechaInscripcion.ToString("MMMM yyyy") : "Marzo 2024";
 
             var ultimoPago = cliente != null 
@@ -263,7 +264,11 @@ namespace AppGimn.Controllers
                 });
             }
 
-            var ultimoPago = await _context.Pagos.Where(p => p.ClienteId == cliente.Id).OrderByDescending(p => p.FechaPago).FirstOrDefaultAsync();
+            var ultimoPago = await _context.Pagos
+                .Where(p => p.ClienteId == cliente.Id)
+                .OrderByDescending(p => p.FechaPago)
+                .Include(p => p.Membresia)
+                .FirstOrDefaultAsync();
 
             bool alDia = ultimoPago != null && ultimoPago.FechaVencimiento >= DateTime.Now.Date;
 
@@ -283,6 +288,8 @@ namespace AppGimn.Controllers
                 ok = true,
                 nombre = cliente.NombreCompleto,
                 dni = cliente.DNI,
+                foto = cliente.FotoUrl,
+                membresia = ultimoPago?.Membresia?.Nombre ?? "Sin membresía",
                 estado = alDia ? "AL_DIA" : "VENCIDO",
                 vencimiento = ultimoPago != null ? ultimoPago.FechaVencimiento.ToString("dd/MM/yyyy") : "Sin registro de cuota"
             });

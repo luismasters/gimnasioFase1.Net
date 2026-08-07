@@ -155,8 +155,8 @@ namespace AppGimn.Data
             }
 
             // ================= 3. SEMBRAR CLIENTES (+35 SOCIOS CON DIVERSOS ESTADOS) =================
-            if (await context.Clientes.CountAsync() < 10)
-            {
+            var dnisExistentes = new HashSet<string>(
+                await context.Clientes.Select(c => c.DNI).ToListAsync());
                 var nuevosClientes = new List<Cliente>
                 {
                     new Cliente { Nombre = "Carlos", Apellido = "Gómez", DNI = "11223344", Email = "cliente@gimnasio.com", Telefono = "1144556677", FechaInscripcion = DateTime.Now.AddMonths(-6), ContactoEmergencia = "Roberto Gómez - 1144001122", ObservacionesMedicas = "Apto físico al día.", EstaActivo = true },
@@ -205,9 +205,40 @@ namespace AppGimn.Data
                     new Cliente { Nombre = "Paloma", Apellido = "Vera", DNI = "33555666", Email = "palo.vera@gmail.com", Telefono = "1133555666", FechaInscripcion = DateTime.Now.AddMonths(-2), ContactoEmergencia = "Novio - 1130000032", ObservacionesMedicas = "Al día.", EstaActivo = true }
                 };
 
-                await context.Clientes.AddRangeAsync(nuevosClientes);
-                await context.SaveChangesAsync();
-            }
+                // Asignar fecha de nacimiento y edad realista a cada socio nuevo (evita edades de 2000+ años)
+                for (int i = 0; i < nuevosClientes.Count; i++)
+                {
+                    var c = nuevosClientes[i];
+                    int anios = 18 + (i % 8) * 3;            // entre 18 y 39 años
+                    int meses = i % 11;
+                    int dias = (i * 5) % 27;
+                    c.FechaNacimiento = DateTime.Today.AddYears(-anios).AddMonths(-meses).AddDays(-dias);
+                }
+
+                // Insertar únicamente socios cuyo DNI aún no exista (idempotente por DNI)
+                var clientesFaltantes = nuevosClientes
+                    .Where(c => !dnisExistentes.Contains(c.DNI))
+                    .ToList();
+
+                if (clientesFaltantes.Any())
+                {
+                    await context.Clientes.AddRangeAsync(clientesFaltantes);
+                    await context.SaveChangesAsync();
+                }
+
+                // Reparar socios ya existentes que quedaron sin fecha de nacimiento (año 1)
+                var clientesSinNacimiento = await context.Clientes
+                    .Where(c => c.FechaNacimiento.Year <= 1900)
+                    .ToListAsync();
+                foreach (var c in clientesSinNacimiento)
+                {
+                    int edad = 25 + (c.Id % 12) * 2;
+                    c.FechaNacimiento = DateTime.Today.AddYears(-edad).AddDays(-(c.Id % 27));
+                }
+                if (clientesSinNacimiento.Any())
+                {
+                    await context.SaveChangesAsync();
+                }
 
             // ================= 4. SEMBRAR PAGOS PARA TODOS LOS SOCIOS =================
             var todosClientes = await context.Clientes.ToListAsync();

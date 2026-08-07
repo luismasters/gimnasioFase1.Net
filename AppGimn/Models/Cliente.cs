@@ -52,6 +52,10 @@ namespace AppGimn.Models
         [Display(Name = "¿Está Activo?")]
         public bool EstaActivo { get; set; } = true;
 
+        [StringLength(255, ErrorMessage = "La URL de la foto no puede tener más de 255 caracteres")]
+        [Display(Name = "Foto del Cliente")]
+        public string? FotoUrl { get; set; }
+
         // ============ PROPERTIES CALCULADAS ============
         // Esto demuestra tu dominio de C# moderno
 

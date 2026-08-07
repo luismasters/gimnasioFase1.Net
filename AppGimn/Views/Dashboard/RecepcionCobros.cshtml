@@ -9,36 +9,11 @@
     string busquedaDni = ViewBag.BusquedaDni as string ?? "";
 }
 
-<!-- SUB-BARRA DE NAVEGACIÓN EXCLUSIVA DE TRABAJO PARA RECEPCIÓN -->
-<div class="bg-dark border-bottom border-secondary py-2 mb-4">
-    <div class="container-fluid px-lg-4">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div class="d-flex align-items-center gap-2">
-                <span class="saas-badge saas-badge-purple" style="background-color: var(--color-info); color: #fff;">
-                    <i class="bi bi-cash-coin me-1"></i> CONTROL DE CAJA Y COBRO DE CUOTAS
-                </span>
-                <span class="text-white fw-bold d-none d-md-inline">AURA FITNESS CLUB - RECEPCIÓN</span>
-            </div>
-            <div class="nav nav-pills gap-1">
-                <a asp-controller="Dashboard" asp-action="RecepcionPanel" class="nav-link btn-secondary-saas text-white btn-sm px-3">
-                    <i class="bi bi-qr-code-scan me-1"></i> Terminal Check-in
-                </a>
-                <a asp-controller="Dashboard" asp-action="RecepcionCobros" class="nav-link active bg-purple text-white btn-sm px-3">
-                    <i class="bi bi-cash-coin me-1"></i> Cobros & Caja
-                </a>
-                <a asp-controller="Cliente" asp-action="Index" class="nav-link btn-secondary-saas text-white btn-sm px-3">
-                    <i class="bi bi-people me-1"></i> Padrón de Socios
-                </a>
-                <a asp-controller="Cliente" asp-action="Create" class="nav-link btn-secondary-saas text-white btn-sm px-3">
-                    <i class="bi bi-person-plus me-1"></i> Registrar Socio
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="recepcion-layout">
+    <partial name="_RecepcionSidebar" />
 
-<div class="container-fluid px-lg-4 pb-5">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
+    <div class="recepcion-content container-fluid px-lg-4 py-4 pb-5">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 gap-3">
         <div>
             <h2 class="fw-bold text-white mb-1">
                 <i class="bi bi-credit-card-2-front text-success me-2"></i>Cobro de Cuotas & Gestión de Vencidos
@@ -117,8 +92,17 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label text-white small fw-bold">DNI DEL SOCIO A COBRAR</label>
-                    <input type="text" name="dniCliente" class="form-control bg-dark text-white border-secondary fw-bold fs-5" 
-                           placeholder="Ingresar DNI socio..." id="inputDniCobro" value="@(clienteBuscado?.DNI ?? (sociosVencidos.FirstOrDefault()?.DNI ?? "22334455"))" required />
+                    <div class="d-flex align-items-center gap-2">
+                        @if (clienteBuscado != null)
+                        {
+                            <div class="flex-shrink-0">
+                                @{ ViewBag.AvatarSize = 44; }
+                                <partial name="_ClienteAvatar" model="clienteBuscado" />
+                            </div>
+                        }
+                        <input type="text" name="dniCliente" class="form-control bg-dark text-white border-secondary fw-bold fs-5" 
+                               placeholder="Ingresar DNI socio..." id="inputDniCobro" value="@(clienteBuscado?.DNI ?? (sociosVencidos.FirstOrDefault()?.DNI ?? "22334455"))" required />
+                    </div>
                     @if (clienteBuscado != null)
                     {
                         <small class="text-success fw-bold d-block mt-1">✓ Socio Seleccionado: @clienteBuscado.NombreCompleto</small>
@@ -182,8 +166,14 @@
                             {
                                 <tr>
                                     <td class="fw-bold text-white">
-                                        <div><i class="bi bi-person-circle me-1 text-danger"></i>@s.NombreCompleto</div>
-                                        <small class="text-muted">DNI: @s.DNI</small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            @{ ViewBag.AvatarSize = 36; }
+                                            <partial name="_ClienteAvatar" model="s" />
+                                            <div>
+                                                @s.NombreCompleto
+                                                <small class="text-muted fw-normal">DNI: @s.DNI</small>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td class="small text-muted">@(s.Telefono ?? "-")</td>
                                     <td>
@@ -238,7 +228,20 @@
                             {
                                 <tr>
                                     <td><code>@pago.ComprobanteNumero</code></td>
-                                    <td class="fw-bold text-white small">@(pago.Cliente?.NombreCompleto ?? "Socio")</td>
+                                    <td class="fw-bold text-white small">
+                                        @if (pago.Cliente != null)
+                                        {
+                                            <div class="d-flex align-items-center gap-2">
+                                                @{ ViewBag.AvatarSize = 30; }
+                                                <partial name="_ClienteAvatar" model="pago.Cliente" />
+                                                @(pago.Cliente.NombreCompleto)
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @("Socio")
+                                        }
+                                    </td>
                                     <td><span class="badge bg-secondary small">@pago.MedioPago</span></td>
                                     <td class="text-end fw-bold text-success">@pago.Monto.ToString("C")</td>
                                 </tr>
@@ -255,6 +258,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </div>
 
