@@ -1,0 +1,60 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    string clienteNombre = ViewBag.ClienteNombre as string ?? "Carlos Gómez";
+    string clienteFoto = ViewBag.ClienteFoto as string ?? "";
+}
+
+<aside class="cliente-sidebar">
+    <div>
+        <!-- ENCABEZADO DE PERFIL DEL SOCIO -->
+        <div class="cliente-sidebar-profile">
+            @if (!string.IsNullOrEmpty(clienteFoto))
+            {
+                <img src="@clienteFoto" class="cliente-sidebar-avatar" alt="@clienteNombre" />
+            }
+            else
+            {
+                <div class="cliente-sidebar-avatar d-flex align-items-center justify-content-center bg-purple text-white fw-bold fs-4" style="background-color: #8B3DFF;">
+                    @clienteNombre.Substring(0, Math.Min(2, clienteNombre.Length)).ToUpper()
+                </div>
+            }
+            <div class="cliente-sidebar-name">@clienteNombre</div>
+            <div class="cliente-sidebar-role">SOCIO VIP — AURA FITNESS</div>
+        </div>
+
+        <!-- BOTÓN PRINCIPAL DE ACCIÓN RÁPIDA -->
+        <a asp-controller="Dashboard" asp-action="ClienteClases" class="btn btn-sidebar-action text-decoration-none">
+            <i class="bi bi-plus-lg"></i> Reservar Clase
+        </a>
+
+        <!-- NAVEGACIÓN PRINCIPAL -->
+        <nav class="cliente-sidebar-nav">
+            <a asp-controller="Dashboard" asp-action="ClientePanel" class="cliente-nav-item @(action == "ClientePanel" ? "active" : "")">
+                <i class="bi bi-grid-1x2-fill"></i> Mi Inicio
+            </a>
+            <a asp-controller="Dashboard" asp-action="ClienteRutinas" class="cliente-nav-item @(action == "ClienteRutinas" ? "active" : "")">
+                <i class="bi bi-journal-bookmark-fill"></i> Mis Rutinas
+            </a>
+            <a asp-controller="Dashboard" asp-action="ClienteEvolucion" class="cliente-nav-item @(action == "ClienteEvolucion" ? "active" : "")">
+                <i class="bi bi-graph-up-arrow"></i> Mi Evolución
+            </a>
+            <a asp-controller="Dashboard" asp-action="ClienteClases" class="cliente-nav-item @(action == "ClienteClases" ? "active" : "")">
+                <i class="bi bi-calendar-check-fill"></i> Reservar Clases
+            </a>
+        </nav>
+    </div>
+
+    <!-- PIE DEL SIDEBAR: CENTRO DE AYUDA Y LOGOUT -->
+    <div class="cliente-sidebar-footer">
+        <a href="#" onclick="alert('Abriendo Centro de Ayuda Aura Fitness...')" class="cliente-nav-item py-2 text-decoration-none">
+            <i class="bi bi-question-circle"></i> Centro de Ayuda
+        </a>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="cliente-nav-item py-2 w-100 text-start border-0 bg-transparent text-danger">
+                <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+            </button>
+        </form>
+    </div>
+</aside>
